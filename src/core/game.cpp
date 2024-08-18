@@ -1,64 +1,88 @@
-#include <iostream>
-#include <algorithm>
-#include <random>
 #include "game.hpp"
-#include "file_utils.cpp"
+#include "file_utils.hpp"
+#include <algorithm>
+#include <iostream>
+#include <random>
 
-Game::Game() {}
+// Constructor
+Game::Game() : supply({}) {
+}
 
 // Destructor
-Game::~Game(){}
+Game::~Game() {
+}
+
+// Start the game
+void Game::start() {
+    setupGame();
+    while (!checkEndConditions()) {
+        for (auto& player : players) {
+            playTurn(player);
+            if (checkEndConditions()) {
+                break; // Exit if game end conditions are met during a turn
+            }
+        }
+    }
+    determineWinner();
+}
 
 void Game::setupGame() {
-    std::string filename = "../data/dominion_cards.csv";
-    std::vector<std::string> editions = {"Dominion 1st Edition", "Base"};
-    allCards = readCardsFromCSV(filename, editions);
-    selectKingdomCards();
-    // ... set up other game elements ...
-}
-
-
-void Game::selectKingdomCards() {
-    // Check if there are enough cards in supply
-    if (allCards.size() < 10) {
-        std::cerr << "Error: Not enough cards in set to select 10 kingdom cards." << std::endl;
-        return;  // Early exit to avoid out-of-bounds access
+    int numPlayers;
+    std::cout << "Enter the number of players (2-4): ";
+    std::cin >> numPlayers;
+    // Initialize the players
+    for (int i = 1; i < (numPlayers); i++){
+        const Player p = Player("Player " + std::to_string(i));
+        players.push_back(p);
     }
 
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(allCards.begin(), allCards.end(), g);
+    // Initialize the supply with kingdom cards
+    std::string filename = "data/dominion_cards.csv";
+    std::vector<std::string> kingdom_card_editions = {"Dominion 1st Edition"};
+    std::vector<std::string> base_supply_editions = {"Base"};
 
-    kingdomCards.assign(allCards.begin(), allCards.begin() + 10);
+    std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_editions); // Assuming this function reads the cards
+
+    supply = Supply(kingdomCards); // Initialize the supply with kingdom cards
+
+    // Example: Set up other game components, such as dealing initial cards to players
+    for (auto& player : players) {
+        // Example: give each player a starting deck
+        player.initializeStartingDeck(); // Implement this function in the Player class
+    }
+
+    // Additional setup logic...
 }
 
+// Play a single turn for a player
+void Game::playTurn(Player& player) {
+    std::cout << "Player's turn: " << player.getName() << std::endl;
+    // Example: Execute player's actions, buys, and end of turn processing
+    // player.takeTurn(); // Implement this function in the Player class
+}
 
-void displayKingdomCards(const std::vector<Card>& kingdomCards){
-    for (int i = 0; i < kingdomCards.size(); i++)
-    {
-        std::cout << kingdomCards[i].getName() << std::endl;
+// Check if the game end conditions are met
+bool Game::checkEndConditions() {
+    return supply.isGameOver(); // Example end condition; adjust based on your rules
+}
+
+// Determine and announce the winner
+void Game::determineWinner() {
+    // Example: Find the player with the highest score
+    Player* winner = &players[0];
+    for (auto& player : players) {
+        if (player.getScore() > winner->getScore()) { // Implement getScore() in the Player class
+            winner = &player;
+            std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->getScore() << std::endl;
+
+        }
+        else if(player.getScore() == winner->getScore()){
+            std::cout << "Both players tied with a score of: " << player.getScore() << std::endl;
+        }
     }
 }
 
-void Game::start() {
-    // std::string edition;
-    // std::cout << "Enter the Dominion edition you want to play: ";
-    // std::cin >> edition;
-    
-    setupGame();
-    std::cout << "The kingdom cards in this game are: " << std::endl;
-    displayKingdomCards(kingdomCards);
-    // // Main game loop
-    // while (!isGameOver()) {
-    //     playTurn();
-    //     switchToNextPlayer();
-    // }
-    
-    // announceWinner();
-}
-
-int main(int argc, char** argv){
+int main(){
     Game dominion;
     dominion.start();
-    return 0;
 }

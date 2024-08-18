@@ -1,18 +1,37 @@
-# the compiler: gcc for C program, define as g++ for C++
-CC = g++
+# the compiler: clang++ for C++ program
+CC = clang++
 
 # compiler flags:
-#  -g     - this flag adds debugging information to the executable file
-#  -Wall  - this flag is used to turn on most compiler warnings
-CFLAGS  = -g -Wall
+#  -std=c++17 - this flag specifies the C++ standard to use
+#  -stdlib=libc++ - this flag specifies the standard library to use
+#  -g - adds debugging information to the executable file
+#  -Wall - turns on most compiler warnings
+CFLAGS = -std=c++17 -stdlib=libc++ -g -Wall
 
-# The build target 
-TARGET = card
+# Directories
+SRC_DIR = src/core
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
 
+# The build target
+TARGET = $(BUILD_DIR)/game
+
+# List of source files
+SRCS = card.cpp deck.cpp file_utils.cpp game.cpp player.cpp supply.cpp
+
+# List of object files
+OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+
+# Default target
 all: $(TARGET)
 
-$(TARGET): $(TARGET).cpp
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).cpp
+# Rule to compile each source file into an object file
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
+# Rule to clean up the build
 clean:
-	$(RM) $(TARGET)
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all clean

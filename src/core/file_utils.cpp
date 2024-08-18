@@ -4,8 +4,15 @@
 #include <vector>
 #include <unordered_set>
 
+Card::Type stringToType(const std::string& typeStr) {
+    if (typeStr == "Treasure") return Card::Type::TREASURE;
+    if (typeStr == "Victory") return Card::Type::VICTORY;
+    if (typeStr == "Action") return Card::Type::ACTION;
+    if (typeStr == "Curse") return Card::Type::CURSE;
+    return Card::Type::TRASH; // Handle unknown types
+}
 
-std::vector<Card> readCardsFromCSV(const std::string& filename, const std::vector<std::string>& editions) {
+std::vector<Card> FileUtils::readCardsFromCSV(const std::string& filename, const std::vector<std::string>& editions){
     std::vector<Card> cards;
     std::ifstream file(filename);
     std::string line;
@@ -18,20 +25,29 @@ std::vector<Card> readCardsFromCSV(const std::string& filename, const std::vecto
     while (std::getline(file, line)) {
         std::istringstream iss(line);
         std::string token;
-        Card card;
         
         // Read each token and set the corresponding Card attribute
         std::getline(iss, token, ',');
-        card.setName(token);
+        const std::string name = token;
         
         // Read the set (edition) of the card
         std::getline(iss, token, ',');
-        card.setSet(token);
+        const std::string set = token;
+
         
         // Check if the card's set is in the desired editions
-        if (editionSet.find(token) != editionSet.end()) {
-            // ... set other attributes ...
-            // Only add the card if its edition is in the desired editions
+        if (editionSet.find(set) != editionSet.end()) {
+            std::getline(iss, token, ',');
+            const std::string string_type = token;
+            const Card::Type type = stringToType(string_type);
+
+            std::getline(iss, token, ',');
+            std::getline(iss, token, ',');
+            std::getline(iss, token, ',');
+            std::getline(iss, token, ',');
+            const int cost = stoi(token);
+
+            Card card(name, type, cost);
             cards.push_back(card);
         }
     }

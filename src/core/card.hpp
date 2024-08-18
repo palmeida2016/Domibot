@@ -1,18 +1,25 @@
-#ifndef CARD_H
-#define CARD_H
+#ifndef CARD_HPP
+#define CARD_HPP
 
 #include <string>
 #include <vector>
 
+
 class Card {
 public:
-    // Constructor and destructor
-    Card();
+    enum class Type { TREASURE, VICTORY, ACTION, CURSE, TRASH };
+
+    // Constructor
+    Card(const std::string& name, Type type, int cost);
+
+    // Destructor
     ~Card();
-    
-    // Attributes based on Dominion cards dataset
+
+    // Getters and Setters
     std::string getName() const;
     void setName(const std::string& name);
+
+    Type getType() const;
 
     std::string getSet() const;
     void setSet(const std::string& set);
@@ -42,14 +49,13 @@ public:
     void setHasGainEffect(bool hasGainEffect);
 
     // Special functions
-    void playCard(); // Implement the card's effect when played
-    void onTrashEffect(); // Implement the card's effect when trashed
-    void onGainEffect(); // Implement the card's effect when gained
+    void playCard();
+    void onTrashEffect();
+    void onGainEffect();
 
 private:
     std::string name;
-    std::string set;
-    std::vector<std::string> types; // Can hold multiple types
+    Type type;
     int cost;
     int additionalCost;
     int numberOfCards;
@@ -61,10 +67,8 @@ private:
     bool specialSetup;
     int curseCost;
     bool costReducer;
-    std::string associatedToken;
-    std::string associatedToken2;
-    std::string associatedMat;
-    std::vector<std::string> calledCards;
+    std::string set;
+    std::vector<std::string> types;
 };
 
-#endif // CARD_H
+#endif

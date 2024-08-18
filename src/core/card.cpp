@@ -1,19 +1,11 @@
 #include "card.hpp"
 
 // Constructor
-Card::Card() : 
-    cost(0), 
-    additionalCost(0), 
-    numberOfCards(0), 
-    modifyCost(false), 
-    inSupply(false), 
-    hasTrashEffect(false), 
-    hasGainEffect(false), 
-    trasher(false), 
-    specialSetup(false), 
-    curseCost(0), 
-    costReducer(false) 
-{}
+Card::Card(const std::string& name, Type type, int cost)
+    : name(name), type(type), cost(cost), additionalCost(0), 
+      numberOfCards(0), modifyCost(false), inSupply(false), 
+      hasTrashEffect(false), hasGainEffect(false), trasher(false), 
+      specialSetup(false), curseCost(0), costReducer(false) {}
 
 // Destructor
 Card::~Card() {}
@@ -34,6 +26,10 @@ std::string Card::getSet() const {
 
 void Card::setSet(const std::string& set) {
     this->set = set;
+}
+
+Card::Type Card::getType() const{
+    return type;
 }
 
 std::vector<std::string> Card::getTypes() const {
@@ -105,15 +101,12 @@ void Card::setHasGainEffect(bool hasGainEffect) {
 // Special functions
 void Card::playCard() {
     // Implementation of card's effect when played
-    // This will vary depending on the specific card
 }
 
 void Card::onTrashEffect() {
     // Implementation of card's effect when trashed
-    // This will vary depending on the specific card
 }
 
 void Card::onGainEffect() {
     // Implementation of card's effect when gained
-    // This will vary depending on the specific card
 }
