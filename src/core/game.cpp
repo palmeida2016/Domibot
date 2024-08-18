@@ -4,9 +4,14 @@
 #include "game.hpp"
 #include "file_utils.cpp"
 
+Game::Game() {}
+
+// Destructor
+Game::~Game(){}
+
 void Game::setupGame() {
-    std::string filename = "data/dominion_cards.csv";
-    std::vector<std::string> editions = {"Base"};
+    std::string filename = "../data/dominion_cards.csv";
+    std::vector<std::string> editions = {"Dominion 1st Edition", "Base"};
     allCards = readCardsFromCSV(filename, editions);
     selectKingdomCards();
     // ... set up other game elements ...
@@ -14,19 +19,19 @@ void Game::setupGame() {
 
 
 void Game::selectKingdomCards() {
-    std::vector<Card> supplyCards;
-    for (const auto& card : allCards) {
-        if (card.isInSupply()) {
-            supplyCards.push_back(card);
-        }
+    // Check if there are enough cards in supply
+    if (allCards.size() < 10) {
+        std::cerr << "Error: Not enough cards in set to select 10 kingdom cards." << std::endl;
+        return;  // Early exit to avoid out-of-bounds access
     }
 
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(supplyCards.begin(), supplyCards.end(), g);
+    std::shuffle(allCards.begin(), allCards.end(), g);
 
-    kingdomCards.assign(supplyCards.begin(), supplyCards.begin() + 10);
+    kingdomCards.assign(allCards.begin(), allCards.begin() + 10);
 }
+
 
 void displayKingdomCards(const std::vector<Card>& kingdomCards){
     for (int i = 0; i < kingdomCards.size(); i++)
@@ -52,7 +57,7 @@ void Game::start() {
     // announceWinner();
 }
 
-int main() {
+int main(int argc, char** argv){
     Game dominion;
     dominion.start();
     return 0;

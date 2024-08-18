@@ -12,7 +12,6 @@ std::vector<Card> readCardsFromCSV(const std::string& filename, const std::vecto
     
     // Create a set of editions for faster lookup
     std::unordered_set<std::string> editionSet(editions.begin(), editions.end());
-    
     // Skip the header line
     std::getline(file, line);
     
@@ -32,7 +31,6 @@ std::vector<Card> readCardsFromCSV(const std::string& filename, const std::vecto
         // Check if the card's set is in the desired editions
         if (editionSet.find(token) != editionSet.end()) {
             // ... set other attributes ...
-            
             // Only add the card if its edition is in the desired editions
             cards.push_back(card);
         }

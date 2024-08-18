@@ -1,3 +1,6 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <string>
 #include <vector>
 #include "card.hpp"
@@ -5,6 +8,7 @@
 class Game {
 public:
     Game();
+    ~Game();
     void start();
     void setupGame();
     void selectKingdomCards();
@@ -15,3 +19,5 @@ private:
     std::vector<Card> kingdomCards;
     // ... other game state variables ...
 };
+
+#endif
