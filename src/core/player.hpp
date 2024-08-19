@@ -15,6 +15,8 @@ public:
     void buyCard(Card card);
     void endTurn();
 
+    void displayHand();
+
     // Getters and Setters
     int getActions();
     int getBuys();

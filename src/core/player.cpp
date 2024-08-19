@@ -1,4 +1,6 @@
 #include "player.hpp"
+#include <iostream>
+#include <vector> 
 
 Player::Player(std::string name) : name(name), actions(1), buys(1), coins(0) {
     // Initialize the player's deck with starting cards
@@ -94,4 +96,10 @@ int Player::getScore() {
 
 Deck& Player::getDeck() {
     return deck;
+}
+
+void Player::displayHand(){
+    for(int i = 0; i < deck.getHand().size(); i++){
+        std::cout << deck.getHand()[i].getName() << ", ";
+    }
 }

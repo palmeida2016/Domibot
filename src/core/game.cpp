@@ -37,26 +37,57 @@ void Game::setupGame() {
     }
 
     // Initialize the supply with kingdom cards
-    std::string filename = "data/dominion_cards.csv";
+    std::string filename = "../data/dominion_cards.csv";
     std::vector<std::string> kingdom_card_editions = {"Dominion 1st Edition"};
-    std::vector<std::string> base_supply_editions = {"Base"};
+    // std::vector<std::string> base_supply_editions = {"Base"};
 
     std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_editions); // Assuming this function reads the cards
-
     supply = Supply(kingdomCards); // Initialize the supply with kingdom cards
 
-    // Example: Set up other game components, such as dealing initial cards to players
     for (auto& player : players) {
-        // Example: give each player a starting deck
         player.initializeStartingDeck(); // Implement this function in the Player class
     }
+}
 
-    // Additional setup logic...
+void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
+    std::cout << "    Card    |    Amount    |    Cost    |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    for (auto& pile : p){
+        const size_t numSpaces = (16 - pile.first.length());
+        const std::string separator = std::string(numSpaces, ' ');
+        std::cout << "    " << pile.first <<  separator << pile.second.size() << "          " << pile.second[1].getCost() << std::endl;
+    }
 }
 
 // Play a single turn for a player
 void Game::playTurn(Player& player) {
-    std::cout << "Player's turn: " << player.getName() << std::endl;
+    player.startTurn();
+    std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
+
+    std::cout << "Player's turn: " << player.getName() << std::endl << std::endl;
+    std::cout << "What would you like to do?" << std::endl;
+    std::cout << "Options: " << std::endl;
+    std::cout << "S - Print Supply Cards" << std::endl;
+    std::cout << "K - Print Kingdom Cards" << std::endl;
+    std::cout << "H - Print Hand Cards" << std::endl;
+
+    char playerInput;
+    std::cin >> playerInput;
+    std::cout << "\033[2J\033[1;1H";
+
+    if (playerInput == 'S'){
+        displayPiles(supply.getSupplyPiles());
+    }
+    else if (playerInput == 'K'){
+        displayPiles(supply.getKingdomPiles());
+    }
+    else if(playerInput == 'H'){
+        player.displayHand();
+    }
+    else{
+        std::cout << "Please enter an option from provided list." << std::endl;
+    }
+    player.endTurn();
     // Example: Execute player's actions, buys, and end of turn processing
     // player.takeTurn(); // Implement this function in the Player class
 }

@@ -15,10 +15,14 @@ public:
     bool isPileEmpty(const std::string& name) const;
     bool isGameOver() const;
 
-private:
-    std::unordered_map<std::string, std::vector<Card>> piles;
+    std::unordered_map<std::string, std::vector<Card>> getSupplyPiles();
+    std::unordered_map<std::string, std::vector<Card>> getKingdomPiles();
 
-    void initializeSupply(const std::vector<Card>& kingdomCards);
+private:
+    std::unordered_map<std::string, std::vector<Card>> supplyPiles;
+    std::unordered_map<std::string, std::vector<Card>> kingdomPiles;
+
+    void initializeSupply(std::vector<Card> kingdomCards);
     int emptyPileCount() const;
 };
 
