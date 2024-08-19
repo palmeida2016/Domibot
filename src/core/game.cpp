@@ -61,9 +61,10 @@ void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
 
 // Play a single turn for a player
 void Game::playTurn(Player& player) {
-    player.startTurn();
-    std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
 
+    player.startTurn();
+
+    std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
     std::cout << "Player's turn: " << player.getName() << std::endl << std::endl;
     std::cout << "What would you like to do?" << std::endl;
     std::cout << "Options: " << std::endl;
@@ -88,8 +89,6 @@ void Game::playTurn(Player& player) {
         std::cout << "Please enter an option from provided list." << std::endl;
     }
     player.endTurn();
-    // Example: Execute player's actions, buys, and end of turn processing
-    // player.takeTurn(); // Implement this function in the Player class
 }
 
 // Check if the game end conditions are met

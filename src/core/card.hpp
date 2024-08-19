@@ -52,6 +52,11 @@ public:
     void playCard();
     void onTrashEffect();
     void onGainEffect();
+    
+    // Define the equality operator
+    bool operator==(const Card& other) const {
+        return name == other.name;  // Compare the attributes you care about
+    }
 
 private:
     std::string name;
