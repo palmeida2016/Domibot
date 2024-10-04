@@ -10,12 +10,12 @@ Supply::Supply(const std::vector<Card>& kingdomCards) {
 }
 
 // Retrieve a card from the supply
-Card Supply::getCard(const std::string& name) {
-    if (kingdomPiles.find(name) != kingdomPiles.end() && !kingdomPiles[name].empty()) {
-        kingdomPiles[name].back();
+Card Supply::getCard(const std::string& name){
+    if (kingdomPiles.find(name) != kingdomPiles.end() && !kingdomPiles.at(name).empty()) {
+        return kingdomPiles.at(name).back();
     }
-    if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles[name].empty()) {
-        supplyPiles[name].back();
+    if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles.at(name).empty()) {
+        return supplyPiles.at(name).back();
     }
     // Return a default Card or handle the error case
     return Card("", Card::Type::ACTION, 0);
@@ -25,9 +25,10 @@ Card Supply::getCard(const std::string& name) {
 void Supply::removeCard(const std::string& name) {
     if (kingdomPiles.find(name) != kingdomPiles.end() && !kingdomPiles[name].empty()) {
         kingdomPiles[name].pop_back();
-    }
-    if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles[name].empty()) {
+    } else if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles[name].empty()) {
         supplyPiles[name].pop_back();
+    } else {
+        throw std::runtime_error("Cannot remove card: " + name);
     }
 }
 
@@ -81,4 +82,21 @@ std::unordered_map<std::string, std::vector<Card>> Supply::getSupplyPiles(){
 
 std::unordered_map<std::string, std::vector<Card>> Supply::getKingdomPiles(){
     return kingdomPiles;
+}
+
+
+bool Supply::canBuyCard(const std::string& cardName, int coins){
+    Card card = getCard(cardName);
+    // Check if the card exists (not a default card) and the player has enough coins
+    return card.getName() != "" && coins >= card.getCost();
+}
+
+Card Supply::buyCard(const std::string& cardName) {
+    Card card = getCard(cardName);
+    if (card.getName() != "") {
+        removeCard(cardName);
+        return card;
+    }
+    // If we get here, the card couldn't be bought
+    throw std::runtime_error("Cannot buy card: " + cardName);
 }

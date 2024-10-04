@@ -14,6 +14,8 @@ public:
     void start();
     void setupGame();
     void determineWinner();
+    void actionPhase(Player& player);
+    void buyPhase(Player& player);
     // void selectKingdomCards();
     // ... other game methods ...
 

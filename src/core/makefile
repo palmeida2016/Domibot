@@ -1,37 +1,42 @@
-# the compiler: clang++ for C++ program
-CC = clang++
+# Compiler
+CXX := g++
 
-# compiler flags:
-#  -std=c++17 - this flag specifies the C++ standard to use
-#  -stdlib=libc++ - this flag specifies the standard library to use
-#  -g - adds debugging information to the executable file
-#  -Wall - turns on most compiler warnings
-CFLAGS = -std=c++17 -stdlib=libc++ -g -Wall
+# Compiler flags
+CXXFLAGS := -std=c++11 -Wall -Wextra
 
 # Directories
-SRC_DIR = src/core
-BUILD_DIR = build
-OBJ_DIR = $(BUILD_DIR)/obj
+SRC_DIR := sources
+INC_DIR := headers
+OBJ_DIR := obj
+DATA_DIR := ../data
 
-# The build target
-TARGET = $(BUILD_DIR)/game
+# Source files
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 
-# List of source files
-SRCS = card.cpp deck.cpp file_utils.cpp game.cpp player.cpp supply.cpp
+# Object files
+OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
-# List of object files
-OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+# Executable name
+TARGET := game
 
 # Default target
 all: $(TARGET)
 
-# Rule to compile each source file into an object file
+# Rule to create object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c $< -o $@
 
-# Rule to clean up the build
+# Rule to create the executable
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Clean rule
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(OBJ_DIR) $(TARGET)
 
-.PHONY: all clean
+# Run rule
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run

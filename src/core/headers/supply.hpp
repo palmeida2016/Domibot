@@ -15,6 +15,9 @@ public:
     bool isPileEmpty(const std::string& name) const;
     bool isGameOver() const;
 
+    bool canBuyCard(const std::string& cardName, int coins);
+    Card buyCard(const std::string& cardName);
+
     std::unordered_map<std::string, std::vector<Card>> getSupplyPiles();
     std::unordered_map<std::string, std::vector<Card>> getKingdomPiles();
 

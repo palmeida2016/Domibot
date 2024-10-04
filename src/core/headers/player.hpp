@@ -16,6 +16,7 @@ public:
     void endTurn();
 
     void displayHand();
+    bool hasActionCards();
 
     // Getters and Setters
     int getActions();

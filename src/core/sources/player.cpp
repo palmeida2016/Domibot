@@ -25,6 +25,15 @@ void Player::startTurn() {
     deck.draw(5);
 }
 
+bool Player::hasActionCards(){
+    for (const auto& card: deck.getHand()){
+        if (card.getType() == Card::Type::ACTION) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Player::playCard(int cardIndex) {
     // Play a card from hand
     Card card = deck.getHand()[cardIndex];
