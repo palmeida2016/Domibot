@@ -32,8 +32,8 @@ void Game::setupGame() {
     std::cin >> numPlayers;
 
     // Initialize the players
-    for (int i = 1; i < (numPlayers); i++){
-        const Player p = Player("Player " + std::to_string(i));
+    for (int i = 0; i < (numPlayers); i++){
+        const Player p = Player("Player " + std::to_string(i+1));
         players.push_back(p);
     }
 
@@ -61,9 +61,13 @@ void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
     }
 }
 
+void displayPlayerState(Player& player){
+    std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
+}
+
 void Game::playTreasure(Player& player){
     while (player.hasCardType(Card::Type::TREASURE)) {
-        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
+        displayPlayerState(player);
         player.displayHand();
 
         char choice;
@@ -93,7 +97,7 @@ void Game::playTreasure(Player& player){
 
 void Game::actionPhase(Player& player){
     while (player.getActions() > 0 && player.hasCardType(Card::Type::ACTION)) {
-        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
+        displayPlayerState(player);
         player.displayHand();
 
         char actionChoice;
@@ -123,7 +127,7 @@ void Game::actionPhase(Player& player){
 
 void Game::buyPhase(Player& player){
     while (player.getBuys() > 0) {
-        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
+        displayPlayerState(player);
 
         char buyChoice;
         std::cout << "Do you want to buy a card? (Y/N): ";
@@ -155,6 +159,7 @@ void Game::playTurn(Player& player) {
     bool turnCompleted = false;
     bool actionCompleted = false;
     bool buysCompleted = false;
+    bool endedTurn = false;
 
     do{
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
@@ -167,6 +172,7 @@ void Game::playTurn(Player& player) {
         std::cout << "B - Buy cards" << std::endl;
         std::cout << "T - Play treasure cards" << std::endl;
         std::cout << "A - Play action cards" << std::endl;
+        std::cout << "E - END TURN" << std::endl;
 
         char playerInput;
         std::cin >> playerInput;
@@ -192,10 +198,13 @@ void Game::playTurn(Player& player) {
             actionPhase(player);
             actionCompleted = true;
         }
+        else if(playerInput == 'E'){
+            endedTurn = true;
+        }
         else{
             std::cout << "Please enter an option from provided list." << std::endl;
         }
-        turnCompleted = buysCompleted && actionCompleted;
+        turnCompleted = (endedTurn) || (buysCompleted && actionCompleted) || (player.getDeck().getHand().size() <= 0);
     } while(!turnCompleted);
 
     player.endTurn();

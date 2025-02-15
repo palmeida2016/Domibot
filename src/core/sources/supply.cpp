@@ -72,16 +72,8 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
         else{
             numCards = 10 * (numberOfPlayers - 1);
         }
-        std::cout<<"Adding card to supply : " <<card.getName() << std::endl;
         supplyPiles[card.getName()] = std::vector<Card>(numCards, card);
     }
-    // supplyPiles["Copper"] = std::vector<Card>(60, Card("Copper", Card::Type::TREASURE, 0));
-    // supplyPiles["Silver"] = std::vector<Card>(40, Card("Silver", Card::Type::TREASURE, 3));
-    // supplyPiles["Gold"] = std::vector<Card>(30, Card("Gold", Card::Type::TREASURE, 6));
-    // supplyPiles["Estate"] = std::vector<Card>(8, Card("Estate", Card::Type::VICTORY, 1));
-    // supplyPiles["Duchy"] = std::vector<Card>(8, Card("Duchy", Card::Type::VICTORY, 3));
-    // supplyPiles["Province"] = std::vector<Card>(8, Card("Province", Card::Type::VICTORY, 6));
-    // supplyPiles["Curse"] = std::vector<Card>(10, Card("Curse", Card::Type::CURSE, -1));
 
     // Shuffle the Kingdom cards
     std::random_device rd;

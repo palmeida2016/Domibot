@@ -75,7 +75,7 @@ int getVP(Card card){
     if(card.getName() == "Estate"){
         output = 1;
     }
-    else if(card.getName() == "Duc"){
+    else if(card.getName() == "Duchy"){
         output = 3;
     }
     else if (card.getName() == "Province"){
@@ -110,9 +110,11 @@ Deck& Player::getDeck() {
 }
 
 void Player::displayHand(){
-    std::cout << "Your Hand" << std::endl;
+    std::cout << "------------------------"<< std::endl;
+    std::cout << "Your Hand: " << std::endl;
     for(int i = 0; i < deck.getHand().size(); i++){
-        std::cout << "Index " << i << ": " << deck.getHand()[i].getName() << ", ";
+        std::cout << "Index " << i << ": " << deck.getHand()[i].getName() << std::endl;
     }
+    std::cout << "------------------------"<< std::endl;
     std::cout << std::endl;
 }
