@@ -1,11 +1,8 @@
 #include "card.hpp"
 
 // Constructor
-Card::Card(const std::string& name, Type type, int cost)
-    : name(name), type(type), cost(cost), additionalCost(0), 
-      numberOfCards(0), modifyCost(false), inSupply(false), 
-      hasTrashEffect(false), hasGainEffect(false), trasher(false), 
-      specialSetup(false), curseCost(0), costReducer(false) {}
+Card::Card(const std::string& name, const std::string& set, Type type, bool isAttack, int cost, int actions, int cards, int discards, int buys, int coins, int trash, int victoryPoints, bool hasPlayEffect)
+    : name(name), set(set), type(type), isAttack(isAttack), cost(cost), actions(actions), cards(cards), discards(discards), buys(buys), coins(coins), trash(trash), victoryPoints(victoryPoints), hasPlayEffect(hasPlayEffect){}
 
 // Destructor
 Card::~Card() {}
@@ -16,97 +13,47 @@ std::string Card::getName() const {
     return name;
 }
 
-void Card::setName(const std::string& name) {
-    this->name = name;
-}
-
 std::string Card::getSet() const {
     return set;
 }
 
-void Card::setSet(const std::string& set) {
-    this->set = set;
-}
-
-Card::Type Card::getType() const{
+Card::Type Card::getType() const {
     return type;
 }
 
-std::vector<std::string> Card::getTypes() const {
-    return types;
-}
-
-void Card::addType(const std::string& type) {
-    types.push_back(type);
+bool Card::getIsAttack() const {
+    return isAttack;
 }
 
 int Card::getCost() const {
     return cost;
 }
-
-void Card::setCost(int cost) {
-    this->cost = cost;
+int Card::getActions() const {
+    return actions;
 }
-
-int Card::getAdditionalCost() const {
-    return additionalCost;
+int Card::getCards() const {
+    return cards;
 }
-
-void Card::setAdditionalCost(int additionalCost) {
-    this->additionalCost = additionalCost;
+int Card::getDiscards() const {
+    return discards;
 }
-
-int Card::getNumberOfCards() const {
-    return numberOfCards;
+int Card::getBuys() const {
+    return buys;
 }
-
-void Card::setNumberOfCards(int numberOfCards) {
-    this->numberOfCards = numberOfCards;
+int Card::getCoins() const {
+    return coins;
 }
-
-bool Card::isModifyCost() const {
-    return modifyCost;
+int Card::getTrash() const {
+    return trash;
 }
-
-void Card::setModifyCost(bool modifyCost) {
-    this->modifyCost = modifyCost;
+int Card::getVictoryPoints() const {
+    return victoryPoints;
 }
-
-bool Card::isInSupply() const {
-    return inSupply;
+bool Card::getHasPlayEffect() const {
+    return hasPlayEffect;
 }
-
-void Card::setInSupply(bool inSupply) {
-    this->inSupply = inSupply;
-}
-
-bool Card::getHasTrashEffect() const {
-    return hasTrashEffect;
-}
-
-void Card::setHasTrashEffect(bool hasTrashEffect) {
-    this->hasTrashEffect = hasTrashEffect;
-}
-
-bool Card::getHasGainEffect() const {
-    return hasGainEffect;
-}
-
-void Card::setHasGainEffect(bool hasGainEffect) {
-    this->hasGainEffect = hasGainEffect;
-}
-
-// Implement other getters and setters similarly
 
 // Special functions
 void Card::playCard() {
     // Implementation of card's effect when played
-}
-
-void Card::onTrashEffect() {
-    // Implementation of card's effect when trashed
-}
-
-void Card::onGainEffect() {
-    // Implementation of card's effect when gained
 }

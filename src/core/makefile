@@ -11,7 +11,7 @@ OBJ_DIR := obj
 DATA_DIR := ../data
 
 # Source files
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+SRCS := $(wildcard $(SRC_DIR)/*pp)
 
 # Object files
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))

@@ -16,7 +16,7 @@ public:
     void endTurn();
 
     void displayHand();
-    bool hasActionCards();
+    bool hasCardType(Card::Type type);
 
     // Getters and Setters
     int getActions();

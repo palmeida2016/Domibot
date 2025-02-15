@@ -9,10 +9,10 @@ Player::Player(std::string name) : name(name), actions(1), buys(1), coins(0) {
 
 void Player::initializeStartingDeck() {
     for (int i = 0; i < 7; ++i) {
-        deck.addCardToDeck(Card("Copper", Card::Type::TREASURE, 0));
+        deck.addCardToDeck(Card("Copper", "Common", Card::Type::TREASURE, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0));
     }
     for (int i = 0; i < 3; ++i) {
-        deck.addCardToDeck(Card("Estate", Card::Type::VICTORY, 2));
+        deck.addCardToDeck(Card("Estate", "Common", Card::Type::VICTORY, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0));
     }
     deck.shuffle();
 }
@@ -25,9 +25,9 @@ void Player::startTurn() {
     deck.draw(5);
 }
 
-bool Player::hasActionCards(){
+bool Player::hasCardType(Card::Type type){
     for (const auto& card: deck.getHand()){
-        if (card.getType() == Card::Type::ACTION) {
+        if (card.getType() == type) {
             return true;
         }
     }
@@ -38,7 +38,9 @@ void Player::playCard(int cardIndex) {
     // Play a card from hand
     Card card = deck.getHand()[cardIndex];
     // TODO: Implement card effects
-
+    if(card.getType() == Card::Type::TREASURE){
+        this->addCoins(card.getCoins());
+    }
     // After playing, remove from hand and discard
     deck.discard(card);
 }
@@ -108,7 +110,9 @@ Deck& Player::getDeck() {
 }
 
 void Player::displayHand(){
+    std::cout << "Your Hand" << std::endl;
     for(int i = 0; i < deck.getHand().size(); i++){
-        std::cout << deck.getHand()[i].getName() << ", ";
+        std::cout << "Index " << i << ": " << deck.getHand()[i].getName() << ", ";
     }
+    std::cout << std::endl;
 }

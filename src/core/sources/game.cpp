@@ -5,7 +5,7 @@
 #include <random>
 
 // Constructor
-Game::Game() : supply({}) {
+Game::Game() : supply({}, {}, 0) {
 }
 
 // Destructor
@@ -30,22 +30,24 @@ void Game::setupGame() {
     int numPlayers;
     std::cout << "Enter the number of players (2-4): ";
     std::cin >> numPlayers;
+
     // Initialize the players
     for (int i = 1; i < (numPlayers); i++){
         const Player p = Player("Player " + std::to_string(i));
         players.push_back(p);
     }
 
-    // Initialize the supply with kingdom cards
-    std::string filename = "../data/dominion_cards.csv";
-    std::vector<std::string> kingdom_card_editions = {"Dominion 1st Edition"};
-    // std::vector<std::string> base_supply_editions = {"Base"};
+    std::string filename = "../data/dominion_cards_updated.csv";
+    std::string kingdom_card_edition = "Base";
+    std::string supply_edition = "Common";
 
-    std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_editions); // Assuming this function reads the cards
-    supply = Supply(kingdomCards); // Initialize the supply with kingdom cards
+    std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_edition);
+    std::vector<Card> supplyCards = FileUtils::readCardsFromCSV(filename, supply_edition);
+
+    supply = Supply(kingdomCards, supplyCards, numPlayers); // Initialize the supply 
 
     for (auto& player : players) {
-        player.initializeStartingDeck(); // Implement this function in the Player class
+        player.initializeStartingDeck();
     }
 }
 
@@ -59,8 +61,38 @@ void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
     }
 }
 
+void Game::playTreasure(Player& player){
+    while (player.hasCardType(Card::Type::TREASURE)) {
+        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
+        player.displayHand();
+
+        char choice;
+        std::cout << "Do you want to play a treasure card? (Y/N): ";
+        std::cin >> choice;
+
+        if (toupper(choice) == 'Y') {
+            std::cout << "Enter the index of the treasure card you want to play: ";
+            int cardIndex;
+            std::cin >> cardIndex;
+
+            if (cardIndex >= 0 && cardIndex < player.getDeck().getHand().size()) {
+                Card& chosenCard = player.getDeck().getHand()[cardIndex];
+                if (chosenCard.getType() == Card::Type::TREASURE) {
+                    player.playCard(cardIndex);
+                } else {
+                    std::cout << "That's not a treasure card. Please choose a treasure card." << std::endl;
+                }
+            } else {
+                std::cout << "Invalid card index. Please try again." << std::endl;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
 void Game::actionPhase(Player& player){
-    while (player.getActions() > 0 && player.hasActionCards()) {
+    while (player.getActions() > 0 && player.hasCardType(Card::Type::ACTION)) {
         std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
         player.displayHand();
 
@@ -133,6 +165,7 @@ void Game::playTurn(Player& player) {
         std::cout << "K - Print Kingdom Cards" << std::endl;
         std::cout << "H - Print Hand Cards" << std::endl;
         std::cout << "B - Buy cards" << std::endl;
+        std::cout << "T - Play treasure cards" << std::endl;
         std::cout << "A - Play action cards" << std::endl;
 
         char playerInput;
@@ -151,6 +184,9 @@ void Game::playTurn(Player& player) {
         else if(playerInput == 'B'){
             buyPhase(player);
             buysCompleted = true;
+        }
+        else if(playerInput == 'T'){
+            playTreasure(player);
         }
         else if(playerInput == 'A'){
             actionPhase(player);

@@ -4,9 +4,10 @@
 #include <random>
 #include "card.hpp"
 #include "supply.hpp"
-// Constructor that initializes the supply with the given Kingdom cards
-Supply::Supply(const std::vector<Card>& kingdomCards) {
-    initializeSupply(kingdomCards);
+#include <iostream>
+
+Supply::Supply(const std::vector<Card>& kingdomCards, const std::vector<Card>& supplyCards, const int numberOfPlayers) {
+    initializeSupply(kingdomCards, supplyCards, numberOfPlayers);
 }
 
 // Retrieve a card from the supply
@@ -18,7 +19,7 @@ Card Supply::getCard(const std::string& name){
         return supplyPiles.at(name).back();
     }
     // Return a default Card or handle the error case
-    return Card("", Card::Type::ACTION, 0);
+    return kingdomPiles[0][0];
 }
 
 // Remove a card from the supply
@@ -40,27 +41,56 @@ bool Supply::isPileEmpty(const std::string& name) const {
 // Check if the game is over based on empty piles
 bool Supply::isGameOver() const {
     return isPileEmpty("Province") || emptyPileCount() >= 3;
+    // return false;
 }
 
-void Supply::initializeSupply(std::vector<Card> kingdom) {
+void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> supplyCards, int numberOfPlayers) {
+    
     // Add basic cards to the supply
-    supplyPiles["Copper"] = std::vector<Card>(60, Card("Copper", Card::Type::TREASURE, 0));
-    supplyPiles["Silver"] = std::vector<Card>(40, Card("Silver", Card::Type::TREASURE, 3));
-    supplyPiles["Gold"] = std::vector<Card>(30, Card("Gold", Card::Type::TREASURE, 6));
-    supplyPiles["Estate"] = std::vector<Card>(8, Card("Estate", Card::Type::VICTORY, 1));
-    supplyPiles["Duchy"] = std::vector<Card>(8, Card("Duchy", Card::Type::VICTORY, 3));
-    supplyPiles["Province"] = std::vector<Card>(8, Card("Province", Card::Type::VICTORY, 6));
-    supplyPiles["Curse"] = std::vector<Card>(10, Card("Curse", Card::Type::CURSE, -1));
-
+    for(auto& card : supplyCards){
+        int numCards = 0;
+        if (card.getType() == Card::Type::TREASURE){
+            if(card.getName() == "Copper"){
+                numCards = 60 - (7 * numberOfPlayers);
+            }
+            else if (card.getName() == "Silver")
+            {
+                numCards = 40;
+            }
+            else{
+                numCards = 30;
+            }
+        }
+        else if (card.getType() == Card::Type::VICTORY){
+            if(numberOfPlayers == 2){
+                numCards = 8;
+            }
+            else{
+                numCards = 12;
+            }
+        }
+        else{
+            numCards = 10 * (numberOfPlayers - 1);
+        }
+        std::cout<<"Adding card to supply : " <<card.getName() << std::endl;
+        supplyPiles[card.getName()] = std::vector<Card>(numCards, card);
+    }
+    // supplyPiles["Copper"] = std::vector<Card>(60, Card("Copper", Card::Type::TREASURE, 0));
+    // supplyPiles["Silver"] = std::vector<Card>(40, Card("Silver", Card::Type::TREASURE, 3));
+    // supplyPiles["Gold"] = std::vector<Card>(30, Card("Gold", Card::Type::TREASURE, 6));
+    // supplyPiles["Estate"] = std::vector<Card>(8, Card("Estate", Card::Type::VICTORY, 1));
+    // supplyPiles["Duchy"] = std::vector<Card>(8, Card("Duchy", Card::Type::VICTORY, 3));
+    // supplyPiles["Province"] = std::vector<Card>(8, Card("Province", Card::Type::VICTORY, 6));
+    // supplyPiles["Curse"] = std::vector<Card>(10, Card("Curse", Card::Type::CURSE, -1));
 
     // Shuffle the Kingdom cards
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(kingdom.begin(), kingdom.end(), g);
+    std::shuffle(kingdomCards.begin(), kingdomCards.end(), g);
 
     // Select the first 10 Kingdom cards and add them to the supply
-    for (size_t i = 0; i < 10 && i < kingdom.size(); ++i) {
-        const auto& card = kingdom[i];
+    for (size_t i = 0; i < 10 && i < kingdomCards.size(); ++i) {
+        const auto& card = kingdomCards[i];
         kingdomPiles[card.getName()] = std::vector<Card>(10, card);
     }
 }
@@ -97,6 +127,6 @@ Card Supply::buyCard(const std::string& cardName) {
         removeCard(cardName);
         return card;
     }
-    // If we get here, the card couldn't be bought
+
     throw std::runtime_error("Cannot buy card: " + cardName);
 }

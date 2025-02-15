@@ -8,7 +8,7 @@
 
 class Supply {
 public:
-    Supply(const std::vector<Card>& kingdomCards);
+    Supply(const std::vector<Card>& kingdomCards, const std::vector<Card>& supplyCards, const int numberOfPlayers);
 
     Card getCard(const std::string& name);
     void removeCard(const std::string& name);
@@ -25,7 +25,7 @@ private:
     std::unordered_map<std::string, std::vector<Card>> supplyPiles;
     std::unordered_map<std::string, std::vector<Card>> kingdomPiles;
 
-    void initializeSupply(std::vector<Card> kingdomCards);
+    void initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> supplyCards, int numberOfPlayers);
     int emptyPileCount() const;
 };
 

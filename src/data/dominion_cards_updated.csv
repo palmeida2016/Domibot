@@ -1,0 +1,33 @@
+Card Name,Set,Type,Attack,Cost,Actions,Cards,Discards,Buys,Coins,Trash,VP,Has Play Effect
+Copper,Common,Treasure,0,0,0,0,0,0,1,0,0,0
+Silver,Common,Treasure,0,3,0,0,0,0,2,0,0,0
+Gold,Common,Treasure,0,6,0,0,0,0,3,0,0,0
+Estate,Common,Victory,0,2,0,0,0,0,0,0,1,0
+Duchy,Common,Victory,0,5,0,0,0,0,0,0,3,0
+Province,Common,Victory,0,8,0,0,0,0,0,0,6,0
+Curse,Common,Curse,0,0,0,0,0,0,0,0,-1,0
+Artisan,Base,Action,0,6,0,1,1,0,0,0,0,1
+Bandit,Base,Action,1,5,0,0,0,0,0,0,0,1
+Bureaucrat,Base,Action,1,4,0,0,0,0,0,0,0,1
+Cellar,Base,Action,0,2,1,0,0,0,0,0,0,1
+Chapel,Base,Action,0,2,0,0,0,0,0,4,0,1
+Council Room,Base,Action,0,5,0,4,0,1,0,0,0,0
+Festival,Base,Action,0,5,2,0,0,1,2,0,0,0
+Gardens,Base,Victory,0,4,0,0,0,0,0,0,0,1
+Harbinger,Base,Action,0,3,1,1,0,0,0,0,0,1
+Laboratory,Base,Action,0,5,1,2,0,0,0,0,0,0
+Library,Base,Action,0,5,0,0,0,0,0,0,0,1
+Market,Base,Action,0,5,1,1,0,1,1,0,0,0
+Merchant,Base,Action,0,3,1,1,0,0,0,0,0,1
+Militia,Base,Action,1,4,0,0,0,0,2,0,0,1
+Mine,Base,Action,0,5,0,0,0,0,0,0,0,1
+Moat,Base,Action,0,2,0,2,0,0,0,0,0,0
+Money Lender,Base,Action,0,4,0,0,0,0,0,0,0,1
+Poacher,Base,Action,0,4,1,1,0,0,1,0,0,1
+Remodel,Base,Action,0,5,1,1,0,0,0,0,0,1
+Smithy,Base,Action,0,4,0,3,0,0,0,0,0,0
+Throne Room,Base,Action,0,4,0,0,0,0,0,0,0,1
+Vassal,Base,Action,0,3,0,0,0,0,2,0,0,1
+Village,Base,Action,0,3,2,1,0,0,0,0,0,0
+Witch,Base,Action,1,5,0,2,0,0,0,0,0,1
+Workshop,Base,Action,0,3,0,0,0,0,0,0,0,1
