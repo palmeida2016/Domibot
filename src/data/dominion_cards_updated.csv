@@ -5,7 +5,7 @@ Gold,Common,Treasure,0,6,0,0,0,0,3,0,0,0
 Estate,Common,Victory,0,2,0,0,0,0,0,0,1,0
 Duchy,Common,Victory,0,5,0,0,0,0,0,0,3,0
 Province,Common,Victory,0,8,0,0,0,0,0,0,6,0
-Curse,Common,Curse,0,0,0,0,0,0,0,0,-1,0
+Curse,Common,Curse,0,0,0,0,0,0,0,0,1,0
 Artisan,Base,Action,0,6,0,1,1,0,0,0,0,1
 Bandit,Base,Action,1,5,0,0,0,0,0,0,0,1
 Bureaucrat,Base,Action,1,4,0,0,0,0,0,0,0,1

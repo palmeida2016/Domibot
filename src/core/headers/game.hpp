@@ -3,9 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "card.hpp"
-#include "supply.hpp"
 #include "player.hpp"
+#include "supply.hpp"
 
 class Game {
 public:
@@ -15,10 +14,9 @@ public:
     void setupGame();
     void determineWinner();
     void actionPhase(Player& player);
+    void applyAttackEffect(Player& attacker, const AttackEffect& effect);
     void playTreasure(Player& player);
     void buyPhase(Player& player);
-    // void selectKingdomCards();
-    // ... other game methods ...
 
 private:
     std::vector<Player> players;

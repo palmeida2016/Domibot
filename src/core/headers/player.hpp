@@ -2,8 +2,9 @@
 #define PLAYER_HPP
 
 #include <string>
+// #include "card.hpp"
 #include "deck.hpp"
-#include "card.hpp"
+#include "card_effect.hpp"
 
 class Player {
 public:
@@ -11,25 +12,27 @@ public:
 
     void initializeStartingDeck();
     void startTurn();
-    void playCard(int cardIndex);
+    void playCard(size_t cardIndex);
+    void applyCardEffect(const CardEffect& effect);
     void buyCard(Card card);
     void endTurn();
 
     void displayHand();
-    bool hasCardType(Card::Type type);
+    bool hasCardType(CardType type);
 
     // Getters and Setters
-    int getActions();
-    int getBuys();
-    int getCoins();
-    std::string getName();
+    int getActions() { return actions; }
+    int getBuys() { return buys; }
+    int getCoins() { return coins; }
+    int getScore() { return points; }
+    std::string getName() { return name; }
+    Deck& getDeck() { return deck; }
 
-    int getScore();
-    Deck& getDeck();
+    void addCoins(int amount) { coins += amount; }
+    void addActions(int amount) { actions += amount; }
+    void addBuys(int amount) { buys += amount; }
+    void addVictoryPoints(int amount) { points += amount; };
 
-    void addCoins(int amount);
-    void addActions(int amount);
-    void addBuys(int amount);
 
 private:
     std::string name;
@@ -37,6 +40,7 @@ private:
     int actions;
     int buys;
     int coins;
+    int points;
 };
 
 

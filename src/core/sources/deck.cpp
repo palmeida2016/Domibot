@@ -21,14 +21,13 @@ void Deck::draw(int numCards) {
 }
 
 void Deck::discard(Card card) {
-    // Remove the element using erase function and iterators 
-    auto it = std::find(hand.begin(), hand.end(), card); 
-  
-    // If element is found found, erase it 
-    if (it != hand.end()) { 
-        hand.erase(it); 
-    } 
-    discardPile.push_back(card);
+    for (size_t i = 0; i < hand.size(); i++) {
+        if (hand[i].getName() == card.getName()) {
+            hand.erase(hand.begin() + i);
+            discardPile.push_back(card);
+            return;
+        }
+    }
 }
 
 void Deck::addCardToDeck(Card card) {

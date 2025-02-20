@@ -49,7 +49,7 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
     // Add basic cards to the supply
     for(auto& card : supplyCards){
         int numCards = 0;
-        if (card.getType() == Card::Type::TREASURE){
+        if (card.getType() == CardType::TREASURE){
             if(card.getName() == "Copper"){
                 numCards = 60 - (7 * numberOfPlayers);
             }
@@ -61,7 +61,7 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
                 numCards = 30;
             }
         }
-        else if (card.getType() == Card::Type::VICTORY){
+        else if (card.getType() == CardType::VICTORY){
             if(numberOfPlayers == 2){
                 numCards = 8;
             }

@@ -65,92 +65,6 @@ void displayPlayerState(Player& player){
     std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
 }
 
-void Game::playTreasure(Player& player){
-    while (player.hasCardType(Card::Type::TREASURE)) {
-        displayPlayerState(player);
-        player.displayHand();
-
-        char choice;
-        std::cout << "Do you want to play a treasure card? (Y/N): ";
-        std::cin >> choice;
-
-        if (toupper(choice) == 'Y') {
-            std::cout << "Enter the index of the treasure card you want to play: ";
-            int cardIndex;
-            std::cin >> cardIndex;
-
-            if (cardIndex >= 0 && cardIndex < player.getDeck().getHand().size()) {
-                Card& chosenCard = player.getDeck().getHand()[cardIndex];
-                if (chosenCard.getType() == Card::Type::TREASURE) {
-                    player.playCard(cardIndex);
-                } else {
-                    std::cout << "That's not a treasure card. Please choose a treasure card." << std::endl;
-                }
-            } else {
-                std::cout << "Invalid card index. Please try again." << std::endl;
-            }
-        } else {
-            break;
-        }
-    }
-}
-
-void Game::actionPhase(Player& player){
-    while (player.getActions() > 0 && player.hasCardType(Card::Type::ACTION)) {
-        displayPlayerState(player);
-        player.displayHand();
-
-        char actionChoice;
-        std::cout << "Do you want to play an action card? (Y/N): ";
-        std::cin >> actionChoice;
-
-        if (toupper(actionChoice) == 'Y') {
-            std::cout << "Enter the index of the action card you want to play: ";
-            int cardIndex;
-            std::cin >> cardIndex;
-
-            if (cardIndex >= 0 && cardIndex < player.getDeck().getHand().size()) {
-                Card& chosenCard = player.getDeck().getHand()[cardIndex];
-                if (chosenCard.getType() == Card::Type::ACTION) {
-                    player.playCard(cardIndex);
-                } else {
-                    std::cout << "That's not an action card. Please choose an action card." << std::endl;
-                }
-            } else {
-                std::cout << "Invalid card index. Please try again." << std::endl;
-            }
-        } else {
-            break; // End action phase
-        }
-    }
-}
-
-void Game::buyPhase(Player& player){
-    while (player.getBuys() > 0) {
-        displayPlayerState(player);
-
-        char buyChoice;
-        std::cout << "Do you want to buy a card? (Y/N): ";
-        std::cin >> buyChoice;
-
-        if (toupper(buyChoice) == 'Y') {
-            std::cout << "Enter the name of the card you want to buy: ";
-            std::string cardName;
-            std::cin >> cardName;
-
-            if (supply.canBuyCard(cardName, player.getCoins())) {
-                Card boughtCard = supply.buyCard(cardName);
-                player.buyCard(boughtCard);
-                std::cout << "You bought a " << cardName << "!" << std::endl;
-            } else {
-                std::cout << "You can't buy that card. Please try again." << std::endl;
-            }
-        } else {
-            break; // End buy phase
-        }
-    }
-}
-
 // Play a single turn for a player
 void Game::playTurn(Player& player) {
 
@@ -227,6 +141,79 @@ void Game::determineWinner() {
         }
         else if(player.getScore() == winner->getScore()){
             std::cout << "Both players tied with a score of: " << player.getScore() << std::endl;
+        }
+    }
+}
+
+void Game::actionPhase(Player& player) {
+    while (player.getActions() > 0 && player.hasCardType(CardType::ACTION)) {
+        displayPlayerState(player);
+        player.displayHand();
+        
+        std::cout << "Choose an action card to play (0-" << player.getDeck().getHand().size()-1 
+                  << ") or -1 to end action phase: ";
+        
+        int choice;
+        std::cin >> choice;
+        
+        if (choice == -1) break;
+        
+        if (choice >= 0 && choice < static_cast<int>(player.getDeck().getHand().size())) {
+            Card& card = player.getDeck().getHand()[choice];
+            if (card.getType() == CardType::ACTION) {
+                CardEffect effect = card.getEffect();
+                player.applyCardEffect(effect);
+                
+                // Handle attack effects if present
+                if (effect.attackEffect.type != AttackType::NONE) {
+                    applyAttackEffect(player, effect.attackEffect);
+                }
+                
+                player.addActions(-1);
+            } else {
+                std::cout << "Selected card is not an action card!" << std::endl;
+            }
+        }
+    }
+}
+
+void Game::applyAttackEffect(Player& attacker, const AttackEffect& effect) {
+    for (auto& player : players) {
+        // Skip the attacking player
+        if (&player == &attacker) continue;
+
+        switch (effect.type) {
+            case AttackType::DISCARD:
+                for (int i = 0; i < effect.value; ++i) {
+                    if (!player.getDeck().getHand().empty()) {
+                        // Let player choose a card to discard
+                        std::cout << player.getName() << ", choose a card to discard:" << std::endl;
+                        player.displayHand();
+                        int choice;
+                        std::cin >> choice;
+                        if (choice >= 0 && choice < static_cast<int>(player.getDeck().getHand().size())) {
+                            player.getDeck().discard(player.getDeck().getHand()[choice]);
+                        }
+                    }
+                }
+                break;
+
+            case AttackType::DRAW:
+                player.getDeck().draw(effect.value);
+                break;
+
+            case AttackType::GAIN_CURSE:
+                if (!supply.isPileEmpty("Curse")) {
+                    Card curse = supply.buyCard("Curse");
+                    player.getDeck().addCardToDeck(curse);
+                }
+                break;
+
+            case AttackType::REVEAL_CARDS:
+                // Implementation for revealing cards
+                break;
+            default:
+                break;
         }
     }
 }

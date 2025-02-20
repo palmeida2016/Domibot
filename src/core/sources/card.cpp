@@ -1,59 +1,46 @@
 #include "card.hpp"
 
-// Constructor
-Card::Card(const std::string& name, const std::string& set, Type type, bool isAttack, int cost, int actions, int cards, int discards, int buys, int coins, int trash, int victoryPoints, bool hasPlayEffect)
-    : name(name), set(set), type(type), isAttack(isAttack), cost(cost), actions(actions), cards(cards), discards(discards), buys(buys), coins(coins), trash(trash), victoryPoints(victoryPoints), hasPlayEffect(hasPlayEffect){}
 
-// Destructor
-Card::~Card() {}
-
-// Getter and Setter implementations
-
-std::string Card::getName() const {
-    return name;
+CardType stringToType(const std::string& typeStr) {
+    if (typeStr == "Treasure") return CardType::TREASURE;
+    if (typeStr == "Victory") return CardType::VICTORY;
+    if (typeStr == "Action") return CardType::ACTION;
+    if (typeStr == "Curse") return CardType::CURSE;
+    return CardType::TRASH; // Handle unknown types
 }
 
-std::string Card::getSet() const {
-    return set;
+Card::Card(const std::string& name, const std::string& type, int cost, int actions, int cards, int buys, int coins, int victoryPoints){
+    CardEffect effect = CardEffect(actions, cards, buys, coins, victoryPoints);
+    this->effect = effect;
+    this->type = stringToType(type);
+    this->cost = cost;
+    this->name = name;
 }
 
-Card::Type Card::getType() const {
-    return type;
+// AttackCard implementations
+AttackCard::AttackCard(const std::string& name, const std::string& type, int cost, int actions, int cards, int buys, int coins, int victoryPoints)
+    : Card(name, type, cost, actions, cards, buys, coins, victoryPoints) {
 }
 
-bool Card::getIsAttack() const {
-    return isAttack;
-}
+class MilitiaCard : public AttackCard {
+public:
+    MilitiaCard() 
+        : AttackCard("Militia", "Action", 4, 0, 0, 0, 2, 0) {
+        attackEffect = AttackEffect(AttackType::DISCARD, 2);  // Discard down to 3 cards
+    }
 
-int Card::getCost() const {
-    return cost;
-}
-int Card::getActions() const {
-    return actions;
-}
-int Card::getCards() const {
-    return cards;
-}
-int Card::getDiscards() const {
-    return discards;
-}
-int Card::getBuys() const {
-    return buys;
-}
-int Card::getCoins() const {
-    return coins;
-}
-int Card::getTrash() const {
-    return trash;
-}
-int Card::getVictoryPoints() const {
-    return victoryPoints;
-}
-bool Card::getHasPlayEffect() const {
-    return hasPlayEffect;
-}
+    CardEffect getEffect() const {
+        CardEffect baseEffect = Card::getEffect();
+        return CardEffect(
+            baseEffect.actions,
+            baseEffect.cards,
+            baseEffect.buys,
+            baseEffect.coins,
+            baseEffect.victoryPoints,
+            attackEffect
+        );
+    }
 
-// Special functions
-void Card::playCard() {
-    // Implementation of card's effect when played
-}
+private:
+    AttackEffect attackEffect = AttackEffect(AttackType::DISCARD, 2);;
+};
