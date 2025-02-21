@@ -8,17 +8,22 @@ class Deck {
 public:
     void shuffle();
     void draw(int numCards);
-    void discard(Card card);
-    void addCardToDeck(Card card);
+    Card* drawOne();
+    void discard(Card *card);
+    void discard(int cardIndex);
 
-    std::vector<Card> getDrawPile() const;
-    std::vector<Card> getDiscardPile() const;
-    std::vector<Card> getHand() const;
+    void addCardToDeck(Card *card);
+    void trashCardFromHand(int cardIndex);
+    void removeFromDiscardPile(Card *card);
+
+    std::vector<Card*> getDrawPile() const;
+    std::vector<Card*> getDiscardPile() const;
+    std::vector<Card*> getHand() const;
 
 private:
-    std::vector<Card> drawPile;
-    std::vector<Card> discardPile;
-    std::vector<Card> hand;
+    std::vector<Card*> drawPile;
+    std::vector<Card*> discardPile;
+    std::vector<Card*> hand;
     void reshuffleDiscardPile();
 };
 

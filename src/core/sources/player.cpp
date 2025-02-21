@@ -4,18 +4,20 @@
 
 Player::Player(std::string name) : name(name), actions(1), buys(1), coins(0) {
     // Initialize the player's deck with starting cards
-    this->points = 0;
     initializeStartingDeck();
 }
 
 void Player::initializeStartingDeck() {
     for (int i = 0; i < 7; ++i) {
-        deck.addCardToDeck(Card("Copper", "Treasure", 0, 0, 0, 0, 1, 0));
+        Card *newCard = new Card("Copper", "Treasure", 0, 0, 0, 0, 1, 0);
+        deck.addCardToDeck(newCard);
     }
     for (int i = 0; i < 3; ++i) {
-        deck.addCardToDeck(Card("Estate", "Victory", 2, 0, 0, 0, 0, 1));
-        this->addVictoryPoints(1);
+        Card *newCard = new Card("Estate", "Victory", 2, 0, 0, 0, 0, 1);
+        deck.addCardToDeck(newCard);
     }
+    HarbingerCard *newCard = new HarbingerCard();
+    deck.addCardToDeck(newCard);
     deck.shuffle();
 }
 
@@ -29,7 +31,7 @@ void Player::startTurn() {
 
 bool Player::hasCardType(CardType type){
     for (const auto& card: this->deck.getHand()){
-        if (card.getType() == type) {
+        if (card->getType() == type) {
             return true;
         }
     }
@@ -50,26 +52,26 @@ void Player::playCard(size_t cardIndex) {
         throw std::out_of_range("Invalid card index");
     }
 
-    Card& card = deck.getHand()[cardIndex];
+    Card *card = deck.getHand()[cardIndex];
     
     // Apply the card's effect
-    CardEffect effect = card.getEffect();
+    CardEffect effect = card->getEffect();
     applyCardEffect(effect);
 
     if(effect.attackEffect.type != AttackType::NONE){
-        std::cout << "Playing attack card: " << card.getName() << std::endl;
+        std::cout << "Playing attack card: " << card->getName() << std::endl;
     }
 
     // Move card to discard pile
     deck.discard(card);
 }
 
-void Player::buyCard(Card card) {
+void Player::buyCard(Card *card) {
     // Ensure player has enough coins and buys
-    if (this->coins >= card.getCost() && this->buys > 0) {
+    if (this->coins >= card->getCost() && this->buys > 0) {
         this->deck.addCardToDeck(card);
         --buys;
-        this->coins -= card.getCost();
+        this->coins -= card->getCost();
     }
 }
 
@@ -80,11 +82,47 @@ void Player::endTurn() {
     }
 }
 
+int Player::calculateScore(){
+    int score = 0;
+
+    std::vector<Card*> discardPile = this->getDeck().getDiscardPile();
+    std::vector<Card*> drawPile = this->getDeck().getDrawPile();
+    std::vector<Card*> hand = this->getDeck().getHand();
+    std::vector<std::vector<Card*>> allPiles = {discardPile, drawPile, hand};
+
+    for (std::vector<Card*> pile : allPiles) {
+        for (Card *card: pile){
+            if (card->getType() == CardType::VICTORY){
+                if(card->getName() == "Gardens"){
+                    int totalCards = discardPile.size() + drawPile.size() + hand.size();
+                    score += totalCards / 10;
+                }
+                else{
+                    score += card->getEffect().victoryPoints;
+                }
+            }
+        }
+    }
+
+
+    return score;
+}
+
 void Player::displayHand(){
     std::cout << "------------------------"<< std::endl;
     std::cout << "Your Hand: " << std::endl;
     for(int i = 0; i < deck.getHand().size(); i++){
-        std::cout << "Index " << i << ": " << deck.getHand()[i].getName() << std::endl;
+        std::cout << "Index " << i << ": " << deck.getHand()[i]->getName() << std::endl;
+    }
+    std::cout << "------------------------"<< std::endl;
+    std::cout << std::endl;
+}
+
+void Player::displayDiscardPile(){
+    std::cout << "------------------------"<< std::endl;
+    std::cout << "Your Discard Pile: " << std::endl;
+    for(int i = 0; i < deck.getDiscardPile().size(); i++){
+        std::cout << "Index " << i << ": " << deck.getDiscardPile()[i]->getName() << std::endl;
     }
     std::cout << "------------------------"<< std::endl;
     std::cout << std::endl;

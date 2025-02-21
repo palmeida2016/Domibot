@@ -45,10 +45,6 @@ void Game::setupGame() {
     std::vector<Card> supplyCards = FileUtils::readCardsFromCSV(filename, supply_edition);
 
     supply = Supply(kingdomCards, supplyCards, numPlayers); // Initialize the supply 
-
-    for (auto& player : players) {
-        player.initializeStartingDeck();
-    }
 }
 
 void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
@@ -102,11 +98,11 @@ void Game::playTurn(Player& player) {
             player.displayHand();
         }
         else if(playerInput == 'B'){
-            buyPhase(player);
+            // buyPhase(player);
             buysCompleted = true;
         }
         else if(playerInput == 'T'){
-            playTreasure(player);
+            // playTreasure(player);
         }
         else if(playerInput == 'A'){
             actionPhase(player);
@@ -134,13 +130,13 @@ void Game::determineWinner() {
     // Example: Find the player with the highest score
     Player* winner = &players[0];
     for (auto& player : players) {
-        if (player.getScore() > winner->getScore()) { // Implement getScore() in the Player class
+        if (player.calculateScore() > winner->calculateScore()) { // Implement getScore() in the Player class
             winner = &player;
-            std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->getScore() << std::endl;
+            std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->calculateScore() << std::endl;
 
         }
-        else if(player.getScore() == winner->getScore()){
-            std::cout << "Both players tied with a score of: " << player.getScore() << std::endl;
+        else if(player.calculateScore() == winner->calculateScore()){
+            std::cout << "Both players tied with a score of: " << player.calculateScore() << std::endl;
         }
     }
 }
@@ -159,17 +155,20 @@ void Game::actionPhase(Player& player) {
         if (choice == -1) break;
         
         if (choice >= 0 && choice < static_cast<int>(player.getDeck().getHand().size())) {
-            Card& card = player.getDeck().getHand()[choice];
-            if (card.getType() == CardType::ACTION) {
-                CardEffect effect = card.getEffect();
+            std::cout << "You chose number " << choice << std::endl;
+            Card *card = player.getDeck().getHand().at(choice);
+            std::cout << "You picked the card " << card->getName() << std::endl;
+            if (card->getType() == CardType::ACTION) {
+                CardEffect effect = card->getEffect();
                 player.applyCardEffect(effect);
+                card->play(player);
                 
                 // Handle attack effects if present
-                if (effect.attackEffect.type != AttackType::NONE) {
-                    applyAttackEffect(player, effect.attackEffect);
-                }
+                // if (effect.attackEffect.type != AttackType::NONE) {
+                //     applyAttackEffect(player, effect.attackEffect);
+                // }
                 
-                player.addActions(-1);
+                // player.addActions(-1);
             } else {
                 std::cout << "Selected card is not an action card!" << std::endl;
             }
@@ -205,7 +204,7 @@ void Game::applyAttackEffect(Player& attacker, const AttackEffect& effect) {
             case AttackType::GAIN_CURSE:
                 if (!supply.isPileEmpty("Curse")) {
                     Card curse = supply.buyCard("Curse");
-                    player.getDeck().addCardToDeck(curse);
+                    player.getDeck().addCardToDeck(&curse);
                 }
                 break;
 

@@ -14,24 +14,24 @@ public:
     void startTurn();
     void playCard(size_t cardIndex);
     void applyCardEffect(const CardEffect& effect);
-    void buyCard(Card card);
+    void buyCard(Card *card);
     void endTurn();
 
     void displayHand();
+    void displayDiscardPile();
     bool hasCardType(CardType type);
+    int calculateScore();
 
     // Getters and Setters
     int getActions() { return actions; }
     int getBuys() { return buys; }
     int getCoins() { return coins; }
-    int getScore() { return points; }
     std::string getName() { return name; }
     Deck& getDeck() { return deck; }
 
     void addCoins(int amount) { coins += amount; }
     void addActions(int amount) { actions += amount; }
     void addBuys(int amount) { buys += amount; }
-    void addVictoryPoints(int amount) { points += amount; };
 
 
 private:
@@ -40,7 +40,6 @@ private:
     int actions;
     int buys;
     int coins;
-    int points;
 };
 
 
