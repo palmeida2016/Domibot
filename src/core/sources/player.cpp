@@ -16,14 +16,10 @@ void Player::initializeStartingDeck() {
         deck->addCardToDeck(newCard);
     }
     for (int i = 0; i < 3; ++i) {
-        // Card *newCard = new Card("Estate", "Victory", 2, 0, 0, 0, 0, 1);
-        MilitiaCard *newCard = new MilitiaCard();
-
+        Card *newCard = new Card("Estate", "Victory", 2, 0, 0, 0, 0, 1);
         deck->addCardToDeck(newCard);
 
     }
-    // WorkshopCard *newCard = new WorkshopCard();
-    // deck.addCardToDeck(newCard);
     deck->shuffle();
 }
 

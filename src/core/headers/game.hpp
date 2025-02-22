@@ -5,6 +5,7 @@
 #include <vector>
 #include "player.hpp"
 #include "supply.hpp"
+#include "card_factory.hpp"
 
 class Game {
 public:
@@ -13,9 +14,8 @@ public:
     void start();
     void setupGame();
     void determineWinner();
-    void actionPhase(Player* player);
-    void playTreasure(Player* player);
-    void buyPhase(Player* player);
+    void actionStep(Player* player);
+    void buyStep(Player* player);
 
     std::vector<Player*> getOtherPlayers(Player *player);
     Supply getSupply() {return supply;};
