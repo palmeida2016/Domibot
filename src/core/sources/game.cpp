@@ -38,22 +38,27 @@ void Game::setupGame() {
     }
 
     std::string filename = "../data/dominion_cards_updated.csv";
-    std::string kingdom_card_edition = "Base";
+    std::string kingdom_edition = "Base";
     std::string supply_edition = "Common";
 
-    std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_edition);
-    std::vector<Card> supplyCards = FileUtils::readCardsFromCSV(filename, supply_edition);
+    std::vector<Card*> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_edition);
+    std::vector<Card*> supplyCards = FileUtils::readCardsFromCSV(filename, supply_edition);
 
     supply = Supply(kingdomCards, supplyCards, numPlayers); // Initialize the supply 
 }
 
-void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
-    std::cout << "    Card    |    Amount    |    Cost    |" << std::endl;
+void Game::displayPiles(const std::vector<CardType>& types){
+    std::cout << "----------------- Supply ---------------" << std::endl;
+    std::cout << "|    Card    |    Cost    |    Amount    |" << std::endl;
     std::cout << "-----------------------------------------" << std::endl;
-    for (auto& pile : p){
-        const size_t numSpaces = (16 - pile.first.length());
-        const std::string separator = std::string(numSpaces, ' ');
-        std::cout << "    " << pile.first <<  separator << pile.second.size() << "          " << pile.second[1].getCost() << std::endl;
+    for (auto& type: types){
+        for (auto& pile : supply.getSupplyPiles()){
+            if(pile.second[1]->getType() == type){
+                const size_t numSpaces = (16 - pile.first.length());
+                const std::string separator = std::string(numSpaces, ' ');
+                std::cout << "    " << pile.first <<  separator << pile.second[1]->getCost() << "          " << pile.second.size() << std::endl;
+            }
+        }
     }
 }
 
@@ -77,7 +82,6 @@ void Game::playTurn(Player& player) {
         std::cout << "What would you like to do?" << std::endl;
         std::cout << "Options: " << std::endl;
         std::cout << "S - Print Supply Cards" << std::endl;
-        std::cout << "K - Print Kingdom Cards" << std::endl;
         std::cout << "H - Print Hand Cards" << std::endl;
         std::cout << "B - Buy cards" << std::endl;
         std::cout << "T - Play treasure cards" << std::endl;
@@ -89,10 +93,7 @@ void Game::playTurn(Player& player) {
         std::cout << "\033[2J\033[1;1H";
 
         if (playerInput == 'S'){
-            displayPiles(supply.getSupplyPiles());
-        }
-        else if (playerInput == 'K'){
-            displayPiles(supply.getKingdomPiles());
+            displayPiles();
         }
         else if(playerInput == 'H'){
             player.displayHand();
@@ -161,7 +162,7 @@ void Game::actionPhase(Player& player) {
             if (card->getType() == CardType::ACTION) {
                 CardEffect effect = card->getEffect();
                 player.applyCardEffect(effect);
-                card->play(player);
+                card->play(player, *this);
                 
                 // Handle attack effects if present
                 // if (effect.attackEffect.type != AttackType::NONE) {
@@ -203,8 +204,8 @@ void Game::applyAttackEffect(Player& attacker, const AttackEffect& effect) {
 
             case AttackType::GAIN_CURSE:
                 if (!supply.isPileEmpty("Curse")) {
-                    Card curse = supply.buyCard("Curse");
-                    player.getDeck().addCardToDeck(&curse);
+                    Card *curse = supply.buyCard("Curse", 0);
+                    player.getDeck().addCardToDeck(curse);
                 }
                 break;
 

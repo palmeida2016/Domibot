@@ -14,10 +14,13 @@ void Player::initializeStartingDeck() {
     }
     for (int i = 0; i < 3; ++i) {
         Card *newCard = new Card("Estate", "Victory", 2, 0, 0, 0, 0, 1);
+        // ThroneRoomCard *newCard = new ThroneRoomCard();
+
         deck.addCardToDeck(newCard);
+
     }
-    HarbingerCard *newCard = new HarbingerCard();
-    deck.addCardToDeck(newCard);
+    // WorkshopCard *newCard = new WorkshopCard();
+    // deck.addCardToDeck(newCard);
     deck.shuffle();
 }
 
@@ -32,6 +35,14 @@ void Player::startTurn() {
 bool Player::hasCardType(CardType type){
     for (const auto& card: this->deck.getHand()){
         if (card->getType() == type) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Player::hasCard(std::string cardName){
+    for (const auto& card: this->deck.getHand()){
+        if (card->getName() == cardName) {
             return true;
         }
     }
@@ -58,9 +69,9 @@ void Player::playCard(size_t cardIndex) {
     CardEffect effect = card->getEffect();
     applyCardEffect(effect);
 
-    if(effect.attackEffect.type != AttackType::NONE){
-        std::cout << "Playing attack card: " << card->getName() << std::endl;
-    }
+    // if(effect.attackEffect.type != AttackType::NONE){
+    //     std::cout << "Playing attack card: " << card->getName() << std::endl;
+    // }
 
     // Move card to discard pile
     deck.discard(card);

@@ -20,6 +20,7 @@ public:
     void displayHand();
     void displayDiscardPile();
     bool hasCardType(CardType type);
+    bool hasCard(std::string cardName);
     int calculateScore();
 
     // Getters and Setters

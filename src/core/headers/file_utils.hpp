@@ -7,7 +7,7 @@
 #include "csv.hpp"
 
 namespace FileUtils {
-    std::vector<Card> readCardsFromCSV(const std::string& filename, const std::string& editionName);
+    std::vector<Card*> readCardsFromCSV(const std::string& filename, const std::string& editionName);
 }
 
 #endif

@@ -13,6 +13,8 @@ public:
     void discard(int cardIndex);
 
     void addCardToDeck(Card *card);
+    void addCardToDiscardPile(Card *card);
+    void addCardToHand(Card *card);
     void trashCardFromHand(int cardIndex);
     void removeFromDiscardPile(Card *card);
 

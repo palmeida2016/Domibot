@@ -2,8 +2,8 @@
 #include <vector>
 #include <unordered_set>
 
-std::vector<Card> FileUtils::readCardsFromCSV(const std::string& filename, const std::string& editionName){
-    std::vector<Card> cards;
+std::vector<Card*> FileUtils::readCardsFromCSV(const std::string& filename, const std::string& editionName){
+    std::vector<Card*> cards;
     // std::cout << "Reading from csv: " << filename << std::endl;
     csv::CSVReader reader(filename);
 
@@ -33,11 +33,11 @@ std::vector<Card> FileUtils::readCardsFromCSV(const std::string& filename, const
             coins = row["Coins"].get<int>();
             victoryPoints = row["VP"].get<int>();
             if(cardName == "Cellar"){
-                CellarCard newCard;
+                CellarCard *newCard = new CellarCard();
                 cards.push_back(newCard);
             }
             else{
-                Card newCard(cardName, type, cost, actions, drawCards, buys, coins, victoryPoints);
+                Card *newCard = new Card(cardName, type, cost, actions, drawCards, buys, coins, victoryPoints);
                 cards.push_back(newCard);
             }
         }

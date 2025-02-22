@@ -6,27 +6,22 @@
 #include "supply.hpp"
 #include <iostream>
 
-Supply::Supply(const std::vector<Card>& kingdomCards, const std::vector<Card>& supplyCards, const int numberOfPlayers) {
+Supply::Supply(const std::vector<Card*>& kingdomCards, const std::vector<Card*>& supplyCards, const int numberOfPlayers) {
     initializeSupply(kingdomCards, supplyCards, numberOfPlayers);
 }
 
 // Retrieve a card from the supply
-Card Supply::getCard(const std::string& name){
-    if (kingdomPiles.find(name) != kingdomPiles.end() && !kingdomPiles.at(name).empty()) {
-        return kingdomPiles.at(name).back();
-    }
+Card* Supply::getCard(const std::string& name){
     if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles.at(name).empty()) {
         return supplyPiles.at(name).back();
     }
     // Return a default Card or handle the error case
-    return kingdomPiles[0][0];
+    return new CellarCard();
 }
 
 // Remove a card from the supply
 void Supply::removeCard(const std::string& name) {
-    if (kingdomPiles.find(name) != kingdomPiles.end() && !kingdomPiles[name].empty()) {
-        kingdomPiles[name].pop_back();
-    } else if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles[name].empty()) {
+    if (supplyPiles.find(name) != supplyPiles.end() && !supplyPiles[name].empty()) {
         supplyPiles[name].pop_back();
     } else {
         throw std::runtime_error("Cannot remove card: " + name);
@@ -35,7 +30,21 @@ void Supply::removeCard(const std::string& name) {
 
 // Check if a specific card pile is empty
 bool Supply::isPileEmpty(const std::string& name) const {
-    return ((supplyPiles.find(name) == supplyPiles.end()) && (kingdomPiles.find(name) == kingdomPiles.end())) || (supplyPiles.at(name).empty() && kingdomPiles.at(name).empty());
+    return ((supplyPiles.find(name) == supplyPiles.end()) || (supplyPiles.at(name).empty()));
+}
+
+int Supply::getNumberOfEmptyPiles() {
+    int emptyCount = 0;
+
+    for (const auto& pile : supplyPiles) {
+        const std::string& cardName = pile.first;
+        
+        if (isPileEmpty(cardName)) {
+            emptyCount++;
+        }
+    }
+
+    return emptyCount;
 }
 
 // Check if the game is over based on empty piles
@@ -44,16 +53,16 @@ bool Supply::isGameOver() const {
     // return false;
 }
 
-void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> supplyCards, int numberOfPlayers) {
+void Supply::initializeSupply(std::vector<Card*> kingdomCards, std::vector<Card*> supplyCards, int numberOfPlayers) {
     
     // Add basic cards to the supply
     for(auto& card : supplyCards){
         int numCards = 0;
-        if (card.getType() == CardType::TREASURE){
-            if(card.getName() == "Copper"){
+        if (card->getType() == CardType::TREASURE){
+            if(card->getName() == "Copper"){
                 numCards = 60 - (7 * numberOfPlayers);
             }
-            else if (card.getName() == "Silver")
+            else if (card->getName() == "Silver")
             {
                 numCards = 40;
             }
@@ -61,7 +70,7 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
                 numCards = 30;
             }
         }
-        else if (card.getType() == CardType::VICTORY){
+        else if (card->getType() == CardType::VICTORY){
             if(numberOfPlayers == 2){
                 numCards = 8;
             }
@@ -72,7 +81,7 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
         else{
             numCards = 10 * (numberOfPlayers - 1);
         }
-        supplyPiles[card.getName()] = std::vector<Card>(numCards, card);
+        supplyPiles[card->getName()] = std::vector<Card*>(numCards, card);
     }
 
     // Shuffle the Kingdom cards
@@ -83,14 +92,14 @@ void Supply::initializeSupply(std::vector<Card> kingdomCards, std::vector<Card> 
     // Select the first 10 Kingdom cards and add them to the supply
     for (size_t i = 0; i < 10 && i < kingdomCards.size(); ++i) {
         const auto& card = kingdomCards[i];
-        kingdomPiles[card.getName()] = std::vector<Card>(10, card);
+        supplyPiles[card->getName()] = std::vector<Card*>(10, card);
     }
 }
 
 // Count the number of empty piles
 int Supply::emptyPileCount() const {
     int count = 0;
-    for (const auto& pair : kingdomPiles) {
+    for (const auto& pair : supplyPiles) {
         if (pair.second.empty()) {
             ++count;
         }
@@ -98,26 +107,24 @@ int Supply::emptyPileCount() const {
     return count;
 }
 
-std::unordered_map<std::string, std::vector<Card>> Supply::getSupplyPiles(){
+std::unordered_map<std::string, std::vector<Card*>> Supply::getSupplyPiles(){
     return supplyPiles;
-}
-
-std::unordered_map<std::string, std::vector<Card>> Supply::getKingdomPiles(){
-    return kingdomPiles;
 }
 
 
 bool Supply::canBuyCard(const std::string& cardName, int coins){
-    Card card = getCard(cardName);
-    // Check if the card exists (not a default card) and the player has enough coins
-    return card.getName() != "" && coins >= card.getCost();
+    Card *card = getCard(cardName);
+    
+    return card->getName() != "" && !isPileEmpty(cardName) && coins >= card->getCost();
 }
 
-Card Supply::buyCard(const std::string& cardName) {
-    Card card = getCard(cardName);
-    if (card.getName() != "") {
+Card* Supply::buyCard(const std::string& cardName, int coins) {
+    if (canBuyCard(cardName, coins)) {
         removeCard(cardName);
-        return card;
+        return getCard(cardName);
+    }
+    else{
+        std::cout << "Cannot buy card!" << std::endl;
     }
 
     throw std::runtime_error("Cannot buy card: " + cardName);

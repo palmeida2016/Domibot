@@ -18,6 +18,9 @@ public:
     void playTreasure(Player& player);
     void buyPhase(Player& player);
 
+    Supply getSupply() {return supply;};
+    void displayPiles(const std::vector<CardType>& types = {CardType::TREASURE, CardType::VICTORY, CardType::CURSE, CardType::ACTION});
+
 private:
     std::vector<Player> players;
     Supply supply;

@@ -52,6 +52,13 @@ void Deck::discard(int cardIndex) {
 void Deck::addCardToDeck(Card *card) {
     drawPile.push_back(card);
 }
+void Deck::addCardToDiscardPile(Card *card){
+    discardPile.push_back(card);
+}
+
+void Deck::addCardToHand(Card *card){
+    hand.push_back(card);
+}
 
 void Deck::trashCardFromHand(int cardIndex){
     hand.erase(hand.begin() + cardIndex);
