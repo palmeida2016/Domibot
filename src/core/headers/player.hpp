@@ -28,7 +28,7 @@ public:
     int getBuys() { return buys; }
     int getCoins() { return coins; }
     std::string getName() { return name; }
-    Deck& getDeck() { return deck; }
+    Deck* getDeck() { return deck; }
 
     void addCoins(int amount) { coins += amount; }
     void addActions(int amount) { actions += amount; }
@@ -37,7 +37,7 @@ public:
 
 private:
     std::string name;
-    Deck deck;
+    Deck* deck;
     int actions;
     int buys;
     int coins;

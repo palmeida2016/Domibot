@@ -16,6 +16,9 @@ Game::~Game() {
 void Game::start() {
     setupGame();
     while (!checkEndConditions()) {
+        for (auto& player : players){
+            player->getDeck()->draw(5);
+        }
         for (auto& player : players) {
             playTurn(player);
             if (checkEndConditions()) {
@@ -33,7 +36,7 @@ void Game::setupGame() {
 
     // Initialize the players
     for (int i = 0; i < (numPlayers); i++){
-        const Player p = Player("Player " + std::to_string(i+1));
+        Player *p = new Player("Player " + std::to_string(i+1));
         players.push_back(p);
     }
 
@@ -67,10 +70,9 @@ void displayPlayerState(Player& player){
 }
 
 // Play a single turn for a player
-void Game::playTurn(Player& player) {
-
-    player.startTurn();
-    
+void Game::playTurn(Player* player) {  
+    player->startTurn();
+  
     bool turnCompleted = false;
     bool actionCompleted = false;
     bool buysCompleted = false;
@@ -78,7 +80,7 @@ void Game::playTurn(Player& player) {
 
     do{
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-        std::cout << "Player's turn: " << player.getName() << std::endl << std::endl;
+        std::cout << "Player's turn: " << player->getName() << std::endl << std::endl;
         std::cout << "What would you like to do?" << std::endl;
         std::cout << "Options: " << std::endl;
         std::cout << "S - Print Supply Cards" << std::endl;
@@ -96,7 +98,7 @@ void Game::playTurn(Player& player) {
             displayPiles();
         }
         else if(playerInput == 'H'){
-            player.displayHand();
+            player->displayHand();
         }
         else if(playerInput == 'B'){
             // buyPhase(player);
@@ -115,10 +117,11 @@ void Game::playTurn(Player& player) {
         else{
             std::cout << "Please enter an option from provided list." << std::endl;
         }
-        turnCompleted = (endedTurn) || (buysCompleted && actionCompleted) || (player.getDeck().getHand().size() <= 0);
+        turnCompleted = (endedTurn) || (buysCompleted && actionCompleted) || (player->getDeck()->getHand().size() <= 0);
     } while(!turnCompleted);
 
-    player.endTurn();
+    player->endTurn();
+    player->getDeck()->draw(5);
 }
 
 // Check if the game end conditions are met
@@ -126,28 +129,37 @@ bool Game::checkEndConditions() {
     return supply.isGameOver(); // Example end condition; adjust based on your rules
 }
 
+std::vector<Player*> Game::getOtherPlayers(Player *player) {
+    std::vector<Player*> playerList;
+    for (auto& p: this->players){
+        if (p->getName() != player->getName()){
+            playerList.push_back(p);
+        }
+    }
+    return playerList;
+}
+
 // Determine and announce the winner
 void Game::determineWinner() {
-    // Example: Find the player with the highest score
-    Player* winner = &players[0];
+    Player* winner = players[0];
     for (auto& player : players) {
-        if (player.calculateScore() > winner->calculateScore()) { // Implement getScore() in the Player class
-            winner = &player;
+        if (player->calculateScore() > winner->calculateScore()) {
+            winner = player;
             std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->calculateScore() << std::endl;
 
         }
-        else if(player.calculateScore() == winner->calculateScore()){
-            std::cout << "Both players tied with a score of: " << player.calculateScore() << std::endl;
+        else if(player->calculateScore() == winner->calculateScore()){
+            std::cout << "Both players tied with a score of: " << player->calculateScore() << std::endl;
         }
     }
 }
 
-void Game::actionPhase(Player& player) {
-    while (player.getActions() > 0 && player.hasCardType(CardType::ACTION)) {
-        displayPlayerState(player);
-        player.displayHand();
+void Game::actionPhase(Player* player) {
+    while (player->getActions() > 0 && player->hasCardType(CardType::ACTION)) {
+        displayPlayerState(*player);
+        player->displayHand();
         
-        std::cout << "Choose an action card to play (0-" << player.getDeck().getHand().size()-1 
+        std::cout << "Choose an action card to play (0-" << player->getDeck()->getHand().size()-1 
                   << ") or -1 to end action phase: ";
         
         int choice;
@@ -155,65 +167,21 @@ void Game::actionPhase(Player& player) {
         
         if (choice == -1) break;
         
-        if (choice >= 0 && choice < static_cast<int>(player.getDeck().getHand().size())) {
+        if (choice >= 0 && choice < static_cast<int>(player->getDeck()->getHand().size())) {
             std::cout << "You chose number " << choice << std::endl;
-            Card *card = player.getDeck().getHand().at(choice);
+            Card *card = player->getDeck()->getHand().at(choice);
             std::cout << "You picked the card " << card->getName() << std::endl;
             if (card->getType() == CardType::ACTION) {
+
                 CardEffect effect = card->getEffect();
-                player.applyCardEffect(effect);
+                player->applyCardEffect(effect);
+
                 card->play(player, *this);
-                
-                // Handle attack effects if present
-                // if (effect.attackEffect.type != AttackType::NONE) {
-                //     applyAttackEffect(player, effect.attackEffect);
-                // }
-                
-                // player.addActions(-1);
+                player->addActions(-1);
+
             } else {
                 std::cout << "Selected card is not an action card!" << std::endl;
             }
-        }
-    }
-}
-
-void Game::applyAttackEffect(Player& attacker, const AttackEffect& effect) {
-    for (auto& player : players) {
-        // Skip the attacking player
-        if (&player == &attacker) continue;
-
-        switch (effect.type) {
-            case AttackType::DISCARD:
-                for (int i = 0; i < effect.value; ++i) {
-                    if (!player.getDeck().getHand().empty()) {
-                        // Let player choose a card to discard
-                        std::cout << player.getName() << ", choose a card to discard:" << std::endl;
-                        player.displayHand();
-                        int choice;
-                        std::cin >> choice;
-                        if (choice >= 0 && choice < static_cast<int>(player.getDeck().getHand().size())) {
-                            player.getDeck().discard(player.getDeck().getHand()[choice]);
-                        }
-                    }
-                }
-                break;
-
-            case AttackType::DRAW:
-                player.getDeck().draw(effect.value);
-                break;
-
-            case AttackType::GAIN_CURSE:
-                if (!supply.isPileEmpty("Curse")) {
-                    Card *curse = supply.buyCard("Curse", 0);
-                    player.getDeck().addCardToDeck(curse);
-                }
-                break;
-
-            case AttackType::REVEAL_CARDS:
-                // Implementation for revealing cards
-                break;
-            default:
-                break;
         }
     }
 }

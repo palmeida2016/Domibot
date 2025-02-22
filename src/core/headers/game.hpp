@@ -13,18 +13,18 @@ public:
     void start();
     void setupGame();
     void determineWinner();
-    void actionPhase(Player& player);
-    void applyAttackEffect(Player& attacker, const AttackEffect& effect);
-    void playTreasure(Player& player);
-    void buyPhase(Player& player);
+    void actionPhase(Player* player);
+    void playTreasure(Player* player);
+    void buyPhase(Player* player);
 
+    std::vector<Player*> getOtherPlayers(Player *player);
     Supply getSupply() {return supply;};
     void displayPiles(const std::vector<CardType>& types = {CardType::TREASURE, CardType::VICTORY, CardType::CURSE, CardType::ACTION});
 
 private:
-    std::vector<Player> players;
+    std::vector<Player*> players;
     Supply supply;
-    void playTurn(Player& player);
+    void playTurn(Player* player);
     bool checkEndConditions();
 };
 
