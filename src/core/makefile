@@ -2,7 +2,7 @@
 CXX := g++
 
 # Compiler flags
-CXXFLAGS := -std=c++11 -Wall -Wextra
+CXXFLAGS := -std=c++17 -Wall -Wextra
 
 # Directories
 SRC_DIR := sources
@@ -11,7 +11,7 @@ OBJ_DIR := obj
 DATA_DIR := ../data
 
 # Source files
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+SRCS := $(wildcard $(SRC_DIR)/*pp)
 
 # Object files
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))

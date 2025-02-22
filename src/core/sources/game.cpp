@@ -1,11 +1,9 @@
 #include "game.hpp"
-#include "file_utils.hpp"
 #include <algorithm>
 #include <iostream>
-#include <random>
 
 // Constructor
-Game::Game() : supply({}) {
+Game::Game() : supply({}, {}, 0) {
 }
 
 // Destructor
@@ -15,6 +13,9 @@ Game::~Game() {
 // Start the game
 void Game::start() {
     setupGame();
+    for (auto& player : players){
+        player->getDeck()->draw(5);
+    }
     while (!checkEndConditions()) {
         for (auto& player : players) {
             playTurn(player);
@@ -30,139 +31,85 @@ void Game::setupGame() {
     int numPlayers;
     std::cout << "Enter the number of players (2-4): ";
     std::cin >> numPlayers;
+
     // Initialize the players
-    for (int i = 1; i < (numPlayers); i++){
-        const Player p = Player("Player " + std::to_string(i));
+    for (int i = 0; i < (numPlayers); i++){
+        Player *p = new Player("Player " + std::to_string(i+1));
         players.push_back(p);
     }
 
-    // Initialize the supply with kingdom cards
-    std::string filename = "../data/dominion_cards.csv";
-    std::vector<std::string> kingdom_card_editions = {"Dominion 1st Edition"};
-    // std::vector<std::string> base_supply_editions = {"Base"};
+    CardFactory& factory = CardFactory::getInstance();
 
-    std::vector<Card> kingdomCards = FileUtils::readCardsFromCSV(filename, kingdom_card_editions); // Assuming this function reads the cards
-    supply = Supply(kingdomCards); // Initialize the supply with kingdom cards
+    std::vector<Card*> kingdomCards = factory.createAllKingdomCards();
+    std::vector<Card*> supplyCards = factory.createSupplyCards();
 
-    for (auto& player : players) {
-        player.initializeStartingDeck(); // Implement this function in the Player class
-    }
+    supply = Supply(kingdomCards, supplyCards, numPlayers); // Initialize the supply 
 }
 
-void displayPiles(const std::unordered_map<std::string, std::vector<Card>> p){
-    std::cout << "    Card    |    Amount    |    Cost    |" << std::endl;
+void Game::displayPiles(const std::vector<CardType>& types){
+    std::cout << "----------------- Supply ---------------" << std::endl;
+    std::cout << "|    Card    |    Cost    |    Amount    |" << std::endl;
     std::cout << "-----------------------------------------" << std::endl;
-    for (auto& pile : p){
-        const size_t numSpaces = (16 - pile.first.length());
-        const std::string separator = std::string(numSpaces, ' ');
-        std::cout << "    " << pile.first <<  separator << pile.second.size() << "          " << pile.second[1].getCost() << std::endl;
-    }
-}
-
-void Game::actionPhase(Player& player){
-    while (player.getActions() > 0 && player.hasActionCards()) {
-        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
-        player.displayHand();
-
-        char actionChoice;
-        std::cout << "Do you want to play an action card? (Y/N): ";
-        std::cin >> actionChoice;
-
-        if (toupper(actionChoice) == 'Y') {
-            std::cout << "Enter the index of the action card you want to play: ";
-            int cardIndex;
-            std::cin >> cardIndex;
-
-            if (cardIndex >= 0 && cardIndex < player.getDeck().getHand().size()) {
-                Card& chosenCard = player.getDeck().getHand()[cardIndex];
-                if (chosenCard.getType() == Card::Type::ACTION) {
-                    player.playCard(cardIndex);
-                } else {
-                    std::cout << "That's not an action card. Please choose an action card." << std::endl;
-                }
-            } else {
-                std::cout << "Invalid card index. Please try again." << std::endl;
+    for (auto& type: types){
+        for (auto& pile : supply.getSupplyPiles()){
+            if(pile.second[1]->getType() == type){
+                const size_t numSpaces = (16 - pile.first.length());
+                const std::string separator = std::string(numSpaces, ' ');
+                std::cout << "    " << pile.first <<  separator << pile.second[1]->getCost() << "          " << pile.second.size() << std::endl;
             }
-        } else {
-            break; // End action phase
         }
     }
 }
 
-void Game::buyPhase(Player& player){
-    while (player.getBuys() > 0) {
-        std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
-
-        char buyChoice;
-        std::cout << "Do you want to buy a card? (Y/N): ";
-        std::cin >> buyChoice;
-
-        if (toupper(buyChoice) == 'Y') {
-            std::cout << "Enter the name of the card you want to buy: ";
-            std::string cardName;
-            std::cin >> cardName;
-
-            if (supply.canBuyCard(cardName, player.getCoins())) {
-                Card boughtCard = supply.buyCard(cardName);
-                player.buyCard(boughtCard);
-                std::cout << "You bought a " << cardName << "!" << std::endl;
-            } else {
-                std::cout << "You can't buy that card. Please try again." << std::endl;
-            }
-        } else {
-            break; // End buy phase
-        }
-    }
+void displayPlayerState(Player& player){
+    std::cout << "Actions: " << player.getActions() << " | Buys: " << player.getBuys() << " | Coins: " << player.getCoins() << std::endl;
 }
 
 // Play a single turn for a player
-void Game::playTurn(Player& player) {
-
-    player.startTurn();
-    
+void Game::playTurn(Player* player) {  
+    player->startTurn();
+  
     bool turnCompleted = false;
-    bool actionCompleted = false;
-    bool buysCompleted = false;
+    bool endedTurn = false;
 
     do{
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-        std::cout << "Player's turn: " << player.getName() << std::endl << std::endl;
+        std::cout << "Player's turn: " << player->getName() << std::endl << std::endl;
         std::cout << "What would you like to do?" << std::endl;
         std::cout << "Options: " << std::endl;
         std::cout << "S - Print Supply Cards" << std::endl;
-        std::cout << "K - Print Kingdom Cards" << std::endl;
         std::cout << "H - Print Hand Cards" << std::endl;
-        std::cout << "B - Buy cards" << std::endl;
-        std::cout << "A - Play action cards" << std::endl;
+        std::cout << "B - Buy a card" << std::endl;
+        std::cout << "P - Play a card" << std::endl;
+        std::cout << "E - END TURN" << std::endl;
 
         char playerInput;
         std::cin >> playerInput;
         std::cout << "\033[2J\033[1;1H";
 
         if (playerInput == 'S'){
-            displayPiles(supply.getSupplyPiles());
-        }
-        else if (playerInput == 'K'){
-            displayPiles(supply.getKingdomPiles());
+            displayPiles();
         }
         else if(playerInput == 'H'){
-            player.displayHand();
+            player->displayHand();
         }
         else if(playerInput == 'B'){
-            buyPhase(player);
-            buysCompleted = true;
+            buyStep(player);
         }
-        else if(playerInput == 'A'){
-            actionPhase(player);
-            actionCompleted = true;
+        else if(playerInput == 'P'){
+            actionStep(player);
+        }
+        else if(playerInput == 'E'){
+            endedTurn = true;
         }
         else{
             std::cout << "Please enter an option from provided list." << std::endl;
         }
-        turnCompleted = buysCompleted && actionCompleted;
+        turnCompleted = (endedTurn) || (player->getBuys() <= 0 && player->getActions() <= 0);
     } while(!turnCompleted);
 
-    player.endTurn();
+    player->endTurn();
+    player->getDeck()->draw(5);
 }
 
 // Check if the game end conditions are met
@@ -170,18 +117,81 @@ bool Game::checkEndConditions() {
     return supply.isGameOver(); // Example end condition; adjust based on your rules
 }
 
+std::vector<Player*> Game::getOtherPlayers(Player *player) {
+    std::vector<Player*> playerList;
+    for (auto& p: this->players){
+        if (p->getName() != player->getName()){
+            playerList.push_back(p);
+        }
+    }
+    return playerList;
+}
+
 // Determine and announce the winner
 void Game::determineWinner() {
-    // Example: Find the player with the highest score
-    Player* winner = &players[0];
+    Player* winner = players[0];
     for (auto& player : players) {
-        if (player.getScore() > winner->getScore()) { // Implement getScore() in the Player class
-            winner = &player;
-            std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->getScore() << std::endl;
+        if (player->calculateScore() > winner->calculateScore()) {
+            winner = player;
+            std::cout << "The winner is: " << winner->getName() << " with a score of: " << winner->calculateScore() << std::endl;
 
         }
-        else if(player.getScore() == winner->getScore()){
-            std::cout << "Both players tied with a score of: " << player.getScore() << std::endl;
+        else if(player->calculateScore() == winner->calculateScore()){
+            std::cout << "Both players tied with a score of: " << player->calculateScore() << std::endl;
+        }
+    }
+}
+
+void Game::buyStep(Player* player) {
+    displayPlayerState(*player);
+    if (player->getBuys() > 0) {
+        if(player->getCoins() > 0){  
+            displayPiles();
+
+            std::cout << "Enter the name of the card you want to purchase (or enter -1 to go back): ";
+            
+            std::string cardName;
+            std::cin >> cardName;
+            
+            if (cardName == "-1") return;
+            
+            Card *boughtCard = supply.buyCard(cardName, player->getCoins());
+            player->getDeck()->addCardToDiscardPile(boughtCard);
+
+        }
+        else{
+            std::cout << "You have no coins remaining this turn!" << std::endl;
+        }
+    }
+    else{
+        std::cout << "You have no buys remaining for this turn!" << std::endl;
+    }
+}
+
+void Game::actionStep(Player* player) {
+    while (player->hasCardType(CardType::TREASURE) || (player->getActions() > 0 && player->hasCardType(CardType::ACTION))) {
+        displayPlayerState(*player);
+        player->displayHand();
+        
+        std::cout << "Choose a card to play (0-" << player->getDeck()->getHand().size()-1 
+                  << ") or -1 to go back: ";
+        
+        int choice;
+        std::cin >> choice;
+        
+        if (choice == -1) break;
+        
+        if (choice >= 0 && choice < static_cast<int>(player->getDeck()->getHand().size())) {
+            Card *card = player->getDeck()->getHand().at(choice);
+            if (card->getType() == CardType::ACTION || card->getType() == CardType::TREASURE) {
+
+                card->play(player, *this);
+                if(card->getType() == CardType::ACTION){
+                    player->addActions(-1);
+                }
+            } else {
+                std::cout << "Selected card is not playable!" << std::endl;
+            }
         }
     }
 }
