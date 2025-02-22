@@ -12,7 +12,6 @@ public:
 
     void initializeStartingDeck();
     void startTurn();
-    void playCard(size_t cardIndex);
     void applyCardEffect(const CardEffect& effect);
     void buyCard(Card *card);
     void endTurn();
@@ -29,6 +28,8 @@ public:
     int getCoins() { return coins; }
     std::string getName() { return name; }
     Deck* getDeck() { return deck; }
+    bool getMerchantEffect() { return hasMerchantEffect; }
+    void setMerchantEffect(bool value) {this->hasMerchantEffect = value;}
 
     void addCoins(int amount) { coins += amount; }
     void addActions(int amount) { actions += amount; }
@@ -41,6 +42,7 @@ private:
     int actions;
     int buys;
     int coins;
+    bool hasMerchantEffect;
 };
 
 

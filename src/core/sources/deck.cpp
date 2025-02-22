@@ -60,6 +60,15 @@ void Deck::addCardToHand(Card *card){
     hand.push_back(card);
 }
 
+void Deck::trashCardFromHand(Card *card){
+    for (size_t i = 0; i < hand.size(); i++) {
+        if (hand.at(i)->getName() == card->getName()) {
+            hand.erase(hand.begin() + i);
+            return;
+        }
+    }
+}
+
 void Deck::trashCardFromHand(int cardIndex){
     hand.erase(hand.begin() + cardIndex);
 }

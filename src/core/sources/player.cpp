@@ -4,6 +4,7 @@
 
 Player::Player(std::string name) : name(name), actions(1), buys(1), coins(0) {
     this->deck = new Deck();
+    this->hasMerchantEffect = false;
 
     // Initialize the player's deck with starting cards
     initializeStartingDeck();
@@ -30,6 +31,7 @@ void Player::startTurn() {
     this->actions = 1;
     this->buys = 1;
     this->coins = 0;
+    this->hasMerchantEffect = false;
 }
 
 bool Player::hasCardType(CardType type){
@@ -58,24 +60,6 @@ void Player::applyCardEffect(const CardEffect& effect) {
     }
 }
 
-void Player::playCard(size_t cardIndex) {
-    if (cardIndex >= deck->getHand().size() || cardIndex < 0) {
-        throw std::out_of_range("Invalid card index");
-    }
-
-    Card *card = deck->getHand()[cardIndex];
-    
-    // Apply the card's effect
-    CardEffect effect = card->getEffect();
-    applyCardEffect(effect);
-
-    // if(effect.attackEffect.type != AttackType::NONE){
-    //     std::cout << "Playing attack card: " << card->getName() << std::endl;
-    // }
-
-    // Move card to discard pile
-    deck->discard(card);
-}
 
 void Player::buyCard(Card *card) {
     // Ensure player has enough coins and buys
@@ -91,6 +75,7 @@ void Player::endTurn() {
     for (auto& card : this->deck->getHand()) {
         deck->discard(card);
     }
+    this->hasMerchantEffect = false;
 }
 
 int Player::calculateScore(){

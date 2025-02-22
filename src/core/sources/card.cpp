@@ -29,11 +29,18 @@ Card::Card(const std::string& name, const std::string& type, int cost, int actio
 // Special Card Implementations
 #include "player.hpp"
 #include "game.hpp"
+
+void Card::play(Player *player, Game &game){
+    player->getDeck()->discard(this);
+    std::cout << "You've played " << this->getName() << std::endl;
+    player->applyCardEffect(this->getEffect());
+}
+
 void CellarCard::play(Player *player, Game &game) {
     //Discard any number of cards.
     //+1 Card per card discarded
-    player->getDeck()->discard(this);
-    std::cout << "You've played Cellar" << std::endl;
+    Card::play(player, game);
+    
     std::cout << "Enter the number of cards you would like to discard: ";
     int numCards = 0;
     std::cin >> numCards;
@@ -62,9 +69,8 @@ void CellarCard::play(Player *player, Game &game) {
 void HarbingerCard::play(Player *player, Game &game) {
     //Look through your discard pile
     //You MAY put a card from it onto your deck
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Harbinger" << std::endl;
     std::cout << "Look through your discard pile and select a card you want to put on top of your deck." << std::endl;
     player->displayDiscardPile();
 
@@ -86,7 +92,7 @@ void HarbingerCard::play(Player *player, Game &game) {
 }
 
 void ChapelCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
     //Trash up to 4 cards from your hand
     int numCards = player->getDeck()->getHand().size();
@@ -94,7 +100,6 @@ void ChapelCard::play(Player *player, Game &game){
         numCards = 4;
     }
 
-    std::cout << "You've played Chapel" << std::endl;
     std::cout << "You may trash up to 4 cards from your hand" << std::endl;
     player->displayHand();
 
@@ -123,10 +128,8 @@ void ChapelCard::play(Player *player, Game &game){
 }
 
 void LibraryCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-
-    std::cout << "You've played Library" << std::endl;
     std::cout << "You will draw until you have 7 cards, selecting which action cards to keep." << std::endl;
     int numCards = player->getDeck()->getHand().size();
 
@@ -145,9 +148,8 @@ void LibraryCard::play(Player *player, Game &game){
 }
 
 void MoneylenderCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Moneylender" << std::endl;
 
     if(player->hasCard("Copper")){
         std::cout << "You may trash a copper in your hand for +3 coins" << std::endl;
@@ -178,9 +180,8 @@ void MoneylenderCard::play(Player *player, Game &game){
 
 // NEEDS GAME REFERENCE
 void RemodelCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Remodel" << std::endl;
     std::cout << "You may now trash a card from your hand to gain a card costing 2 more coins than it" << std::endl;
     player->displayHand();
     std::cout << "Enter the index of the card you want to trash: ";
@@ -209,9 +210,8 @@ void RemodelCard::play(Player *player, Game &game){
 }
 
 void PoacherCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Poacher" << std::endl;
     std::cout << "You must now discard a card per number of empty Supply piles" << std::endl;
 
 
@@ -236,9 +236,8 @@ void PoacherCard::play(Player *player, Game &game){
 }
 
 void WorkshopCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Workshop" << std::endl;
     std::cout << "You can now gain a card costing up to 4 coins" << std::endl;
 
     game.displayPiles();
@@ -252,9 +251,8 @@ void WorkshopCard::play(Player *player, Game &game){
 }
 
 void VassalCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Vassal" << std::endl;
     std::cout << "You will now discard the top card of your deck. If it is an action card, you may choose to play it." << std::endl;
 
     Card *card = player->getDeck()->drawOne();
@@ -279,9 +277,8 @@ void VassalCard::play(Player *player, Game &game){
 }
 
 void ArtisanCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Artisan" << std::endl;
     std::cout << "You can now gain a card costing up to 5 coins, and place a card from your hand onto your deck." << std::endl;
 
     game.displayPiles();
@@ -311,9 +308,8 @@ void ArtisanCard::play(Player *player, Game &game){
 }
 
 void MineCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Mine" << std::endl;
     std::cout << "You may trash a treasure from your hand and gain a treasure to your hand costing up to 3 more coins than it." << std::endl;
 
 
@@ -361,9 +357,8 @@ void MineCard::play(Player *player, Game &game){
 }
 
 void ThroneRoomCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Throne Room" << std::endl;
     std::cout << "You may play an action card from your hand twice this turn." << std::endl;
 
     if(player->hasCardType(CardType::ACTION)){
@@ -395,9 +390,8 @@ void ThroneRoomCard::play(Player *player, Game &game){
 }
 
 void CouncilRoomCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Council Room" << std::endl;
     std::cout << "Every other play must draw a card." << std::endl;
 
     std::vector<Player*> players = game.getOtherPlayers(player);
@@ -409,14 +403,22 @@ void CouncilRoomCard::play(Player *player, Game &game){
 }
 
 void MilitiaCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Militia" << std::endl;
     std::cout << "Every other play must discard down to three cards in hand." << std::endl;
 
     std::vector<Player*> players = game.getOtherPlayers(player);
 
     for (auto& p: players){
+        if(p->hasCard("Moat")){
+            std::cout << p->getName() << " - Would you like to reveal your Moat card to avoid this attack? (Y/N): ";
+            char moatChoice;
+            std::cin >> moatChoice;
+            if(moatChoice == 'Y' || moatChoice == 'y'){
+                continue;
+            }
+        }
+
         std::cout << p->getName() << " - select which cards to discard" << std::endl;
         while(p->getDeck()->getHand().size() > 3){
             p->displayHand();
@@ -435,16 +437,230 @@ void MilitiaCard::play(Player *player, Game &game){
 }
 
 void WitchCard::play(Player *player, Game &game){
-    player->getDeck()->discard(this);
+    Card::play(player, game);
 
-    std::cout << "You've played Witch" << std::endl;
     std::cout << "Every other play must gain a curse." << std::endl;
 
     std::vector<Player*> players = game.getOtherPlayers(player);
 
     for (auto& p: players){
+        if(p->hasCard("Moat")){
+            std::cout << p->getName() << " - Would you like to reveal your Moat card to avoid this attack? (Y/N): ";
+            char moatChoice;
+            std::cin >> moatChoice;
+            if(moatChoice == 'Y' || moatChoice == 'y'){
+                continue;
+            }
+        }
         std::cout << p->getName() << " gained a curse!" << std::endl;
         Card *curse = new CurseCard();
         p->getDeck()->addCardToDiscardPile(curse);
+    }
+}
+
+void BanditCard::play(Player *player, Game &game){
+    Card::play(player, game);
+
+    Card *card = game.getSupply().buyCard("Gold", 6);
+    player->getDeck()->addCardToDiscardPile(card);
+
+    std::cout << "You gained a gold. Now each other player must reveal the top two cards of their deck," << std::endl
+              << "and trash any treasure that isn't copper" <<std::endl;
+    
+    std::vector<Player*> players = game.getOtherPlayers(player);
+
+    for (auto& p: players){
+
+        if(p->hasCard("Moat")){
+            std::cout << p->getName() << " - Would you like to reveal your Moat card to avoid this attack? (Y/N): ";
+            char moatChoice;
+            std::cin >> moatChoice;
+            if(moatChoice == 'Y' || moatChoice == 'y'){
+                continue;
+            }
+        }
+
+        Card *firstCard = p->getDeck()->drawOne();
+        Card *secondCard = p->getDeck()->drawOne();
+        
+        std::cout << p->getName() << " reveals a " << firstCard->getName() << " and a " << secondCard->getName() << std::endl; 
+
+        bool firstCanTrash = false;
+        bool secondCanTrash = false;
+
+        if(firstCard->getType() != CardType::TREASURE || firstCard->getName() == "Copper"){
+            p->getDeck()->discard(firstCard);
+        }
+        else{
+            firstCanTrash = true;
+        }
+
+        if(secondCard->getType() != CardType::TREASURE || secondCard->getName() == "Copper"){
+            p->getDeck()->discard(secondCard);
+        }
+        else{
+            secondCanTrash = true;
+        }
+
+        if(firstCanTrash && secondCanTrash){
+            int choice = -1;
+            while(choice < 0 || choice > 1){
+                std::cout << "Pick which card to trash [0-1]" << std::endl;
+                std::cout << "Index 0: " << firstCard->getName() << std::endl;
+                std::cout << "Index 1: " << secondCard->getName() << std::endl;
+                std::cin >> choice;
+            }
+            if(choice == 0){
+                p->getDeck()->trashCardFromHand(firstCard);
+            }
+            else if(choice == 1){
+                p->getDeck()->trashCardFromHand(secondCard);
+            }
+        }
+        else if(firstCanTrash){
+            p->getDeck()->trashCardFromHand(firstCard);
+        }
+        else{
+            p->getDeck()->trashCardFromHand(secondCard);
+        }
+    }
+}
+
+void BureaucratCard::play(Player *player, Game &game){
+    Card::play(player, game);
+
+    Card *card = game.getSupply().buyCard("Silver", 3);
+    player->getDeck()->addCardToDeck(card);
+
+    std::cout << "Each other player must place a Victory card from their hand onto their deck." << std::endl;
+
+    std::vector<Player*> players = game.getOtherPlayers(player);
+
+    for (auto& p: players){
+        if(p->hasCardType(CardType::VICTORY)){
+            if(p->hasCard("Moat")){
+                std::cout << p->getName() << " - Would you like to reveal your Moat card to avoid this attack? (Y/N): ";
+                char moatChoice;
+                std::cin >> moatChoice;
+                if(moatChoice == 'Y' || moatChoice == 'y'){
+                    continue;
+                }
+            }
+
+            std::cout << p->getName() << " - Select a victory card from your hand to place onto your deck." << std::endl;
+
+            p->displayHand();
+
+            std::cout << "Enter the index of a victory card: ";
+            int cardIndex;
+            std::cin >> cardIndex;
+
+            if (cardIndex >= 0 && cardIndex < static_cast<int>(p->getDeck()->getHand().size())) {
+                Card *card = p->getDeck()->getHand()[cardIndex];
+                while(card->getType() != CardType::VICTORY){
+                    std::cout << "Selected card is not a Victory card." << std::endl;
+                    std::cout << "Please select another card: ";
+                    std::cin >> cardIndex;
+
+                    card = p->getDeck()->getHand()[cardIndex];
+                }
+                p->getDeck()->addCardToDeck(card);
+            }
+            else{
+                std::cout << "Invalid card index!" << std::endl;
+            }
+
+        }
+        else{
+            std::cout << p->getName() << " does not have a Victory card!" << std::endl;
+        }
+    }
+}
+
+void SentryCard::play(Player *player, Game &game){
+    Card::play(player, game);
+
+
+    std::cout << "You may look at the top two cards of your deck, and trash/discard/topdeck any of them." << std::endl;
+
+    Card *firstCard = player->getDeck()->drawOne();
+    Card *secondCard = player->getDeck()->drawOne();
+    Card* cards[] = {firstCard, secondCard};
+        
+    std::cout << "You have a " << firstCard->getName() << " and a " << secondCard->getName() << std::endl;
+
+    int i = 0;
+    int keepCount = 0;
+    int keepIndex = 0;
+    while(i < 2){
+        Card *card = cards[i];
+        std::cout << "Would you like to trash, discard, or keep " << card->getName() << " ?" <<std::endl;
+        std::cout << "T - Trash the Card" << std::endl;
+        std::cout << "D - Discard the Card" << std::endl;
+        std::cout << "K - Keep the Card" << std::endl;
+        std::cout << "Enter your choice: " <<std::endl;
+        char choice;
+        std::cin >> choice;
+
+        while(choice != 'T' && choice != 'D' && choice != 'K'){
+            std::cout << "Please select one of the three options!" << std::endl;
+            std::cout << "Enter your choice: " <<std::endl;
+            std::cin >> choice;
+        }
+
+        if (choice == 'T'){
+            std::cout << "You trashed the " << card->getName();
+            player->getDeck()->trashCardFromHand(card);
+        }
+        else if (choice == 'D'){
+            std::cout << "You discarded the " << card->getName();
+            player->getDeck()->discard(card);
+        }
+        else{
+            keepIndex = i;
+            keepCount++;
+        }
+        i++;
+    }
+    if(keepCount == 2){
+        std::cout << "You chose to keep both of the cards" << std::endl;
+        std::cout << "Would you like to reverse their order?" << std::endl;
+        std::cout << "Current Order: " << std::endl;
+        std::cout << "Top card: " << firstCard->getName() << std::endl;
+        std::cout << "Bottom card: " << secondCard->getName() << std::endl;
+        
+        std::cout << "Put " << secondCard->getName() << " on top of your draw pile? (Y/N)" << std::endl;
+        char choice;
+        std::cin >> choice;
+        if (choice == 'Y'){
+            player->getDeck()->addCardToDeck(firstCard);
+            player->getDeck()->addCardToDeck(secondCard);
+        }
+        else{
+            player->getDeck()->addCardToDeck(secondCard);
+            player->getDeck()->addCardToDeck(firstCard);
+        }
+    }
+    else{
+        player->getDeck()->addCardToDeck(cards[keepIndex]);
+    }
+
+
+}
+
+void MerchantCard::play(Player *player, Game &game) {
+    Card::play(player, game);
+
+    std::cout << "The first time you play a Silver this turn you will gain an extra coin." << std::endl;
+    player->setMerchantEffect(true);
+}
+
+void SilverCard::play(Player *player, Game &game){
+    Card::play(player, game);
+
+    // Has Merchant Effect is active
+    if (player->getMerchantEffect()){
+        player->addCoins(1);
+        player->setMerchantEffect(false);
     }
 }
